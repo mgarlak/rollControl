@@ -1,6 +1,8 @@
+int flightMode;
+
 void setup() {
   // put your setup code here, to run once:
-  int flightMode=0
+  int flightMode=0;
 }
 
 
