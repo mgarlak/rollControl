@@ -8,4 +8,6 @@ Roll control and data logging for KSU HPRC (2017-2018)
 
  [Adafruit BNO055](https://github.com/adafruit/Adafruit_BNO055)
 
+ [SoftwareSerial Lib](https://www.arduino.cc/en/Reference/SoftwareSerial)
+
 
