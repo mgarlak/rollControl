@@ -12,6 +12,8 @@ public:
 	~rocket();
 	int updateSensorData(Adafruit_BMP280, Adafruit_BNO055 /*Other Sensors*/);
 	int logData();
+	double getSpeed();
+	double getSpeedSq();
 private:
 	// Orientation Data
 	double roll;
