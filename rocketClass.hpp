@@ -14,19 +14,16 @@ public:
 	int logData();
 	double getSpeed();
 	double getSpeedSq();
+	double getRoll();
+	double getRollRate();
 private:
 	// Orientation Data
-	double roll;
-	double pitch;
-	double yaw;
-	double rollV;
-	double pitchV;
-	double yawV;
-	double rollA;
-	double pitchA;
-	double yawA;
+	double Q[4];
+	double vQ[4];
+	double aQ[4];
 
 	// Location Data and Trajectory
+	// All values should be in ground frame.
 	double x;
 	double y;
 	double z;
