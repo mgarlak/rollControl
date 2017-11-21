@@ -5,7 +5,7 @@ int rocket::updateSensorData(Adafruit_BMP280 bmp, Adafruit_BNO055 orient /*Other
 }
 
 double rocket::getSpeed(){
-    return sqrt(getSpeed());
+    return sqrt(getSpeedSq());
 }
 double rocket::getSpeedSq(){
     return xV*xV+yV*yV+zV*zV;
