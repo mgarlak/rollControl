@@ -12,6 +12,7 @@ public:
   ~rocket();
   int updateSensorData(Adafruit_BMP280, Adafruit_BNO055 /*Other Sensors*/);
   int logData();
+  int updateRotMatrix();
   double getSpeed();
   double getSpeedSq();
   double getRoll();
@@ -23,6 +24,8 @@ private:
   double Q[4];
   double vQ[4];
   double aQ[4];
+
+  float R[9]; // rotation matrix, stored beause it's frequently used.
 
   // Location Data and Trajectory
   // All values should be in ground frame.
