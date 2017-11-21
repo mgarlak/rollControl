@@ -1,14 +1,32 @@
+#include "rocketClass.hpp"
+#include "rocketClassDef.cpp"
+
 int flightMode;
+Adafruit_BMP280 bmp;
+Adafruit_BNO055 orient;
 
 void setup() {
   // put your setup code here, to run once:
-  int flightMode=0;
+  flightMode=0;
 }
 
 
 
 void loop() {
   //any code that needs to run every loop regardless of flightMode.
+	if (updateSensorData(bmp, orient) < 0){
+		double* qt = getQ();
+
+    Serial.println("PRINTING QUATERION:");
+    Serial.println(qt[0]);
+    Serial.println(qt[1]);
+    Serial.println(qt[2]);
+    Serial.println(qt[3]);
+
+    Serial.println("PRINTING ALTITUDE:");
+    Serial.println(getz())
+
+	}
   case(flightMode){
     case 0 : 
       //On the ground
@@ -27,6 +45,5 @@ void loop() {
       break;
     case 5:
       //on ground
-    
   }
 }
