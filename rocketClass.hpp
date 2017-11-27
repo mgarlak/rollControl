@@ -25,6 +25,10 @@ private:
   double vQ[4];
   double aQ[4];
 
+  double pitch;
+  double roll;
+  double rollRate;
+
   float R[9]; // rotation matrix, stored beause it's frequently used.
 
   // Location Data and Trajectory
