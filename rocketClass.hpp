@@ -17,6 +17,7 @@ public:
   double getSpeedSq();
   double getRoll();
   double getRollRate();
+  double getPitch();
   double getz() {return z;};
   double* getQ() {return Q;};
 private:
