@@ -24,10 +24,10 @@ void loop() {
     Serial.println(qt[3]);
 
     Serial.println("PRINTING ALTITUDE:");
-    Serial.println(getz())
+    Serial.println(getz());
 
 	}
-  case(flightMode){
+  switch (flightMode){
     case 0 : 
       //On the ground
       break;
