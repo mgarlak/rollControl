@@ -42,6 +42,9 @@ private:
   double xA;
   double yA;
   double zA;
+
+  bool rollUp2Date;
+  bool pitchUp2Date;
 };
 
 #endif
