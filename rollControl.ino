@@ -45,5 +45,6 @@ void loop() {
       break;
     case 5:
       //on ground
+      break;
   }
 }
