@@ -15,13 +15,25 @@ struct flightCommand
     short rollTime;                 // Time to get to new heading, in milliseconds
 };
 
+/// if (validFlightPlan) Ensures:
+///     - size() > 0
+///     - 0 <= op[] < size() returns valid flightCommand
 class flightplan
 {
 public:
-    flightplan() { valid = false; }
+    flightplan()
+    {
+        valid = false;
+        commands = new flightCommand[0];
+    }
+
+    ~flightplan()
+    { delete commands; }
 
     const flightCommand operator[](int i) const;
+
     int size();
+
     bool validFlightPlan();
 
     /// Parse a flight plan string format:
@@ -31,4 +43,5 @@ public:
 private:
     bool valid;
     int numberOfFlightCommands;
+    flightCommand* commands;
 };
