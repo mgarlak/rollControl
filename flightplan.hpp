@@ -11,8 +11,8 @@ enum direction
 struct flightCommand
 {
     direction rotationDirection;    // Direction to rotate
-    short heading;                  // Ending heading, in degrees
-    short rollTime;                 // Time to get to new heading, in milliseconds
+    int heading;                  // Ending heading, in degrees
+    int rollTime;                 // Time to get to new heading, in milliseconds
 };
 
 /// if (validFlightPlan) Ensures:
@@ -28,13 +28,21 @@ public:
     }
 
     ~flightplan()
-    { delete commands; }
+    {
+        delete commands;
+    }
 
     const flightCommand operator[](int i) const;
 
-    int size();
+    int size() const
+    {
+        return numberOfFlightCommands;
+    }
 
-    bool validFlightPlan();
+    bool validFlightPlan() const
+    {
+        return valid;
+    }
 
     /// Parse a flight plan string format:
     /// '#3;+0901000;-0001000;~1802000;\0'
