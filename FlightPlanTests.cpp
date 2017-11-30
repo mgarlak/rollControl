@@ -86,7 +86,7 @@ int main()
     }
 
     {
-        std::cerr << "Parse multipule: ";
+        std::cerr << "Parse multipule, normalize heading: ";
         char testPlan[] = "#2;~0901000;+3601500;";
         flightplan fp;
 
@@ -102,7 +102,7 @@ int main()
 
         // Test second command.
         assert(fp[1].rotationDirection == cw);
-        assert(fp[1].heading == 360);
+        assert(fp[1].heading == 0);
         assert(fp[1].rollTime == 1500);
 
         std::cerr << "Done" << std::endl;
