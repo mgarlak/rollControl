@@ -115,7 +115,7 @@ void flightplan::parseFlightPlan(char* plan)
         // Verify next 3 chars are digits.
         if (areDigits(&plan[pos], 3))
         {
-            commands[i].heading = getNumberFromChars(&plan[pos], 3);
+            commands[i].heading = getNumberFromChars(&plan[pos], 3) % 360;
             pos += 3;
         }
         else

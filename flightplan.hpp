@@ -18,6 +18,7 @@ struct flightCommand
 /// if (validFlightPlan) Ensures:
 ///     - size() > 0
 ///     - 0 <= op[] < size() returns valid flightCommand
+///     - 0 <= flightCommand.heading < 360
 class flightplan
 {
 public:
