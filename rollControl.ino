@@ -16,7 +16,7 @@ void loop() {
 	//any code that needs to run every loop regardless of flightMode.
 
 	if (hprcRock.updateSensorData() < 0){
-		double* qt = getQ();
+		double* qt = hprcRock.getQ();
 
 		Serial.println("PRINTING QUATERION:");
 		Serial.println(qt[0]);
@@ -25,7 +25,7 @@ void loop() {
 		Serial.println(qt[3]);
 
 		Serial.println("PRINTING ALTITUDE:");
-		Serial.println(getz());
+		Serial.println(hprcRock.getz());
 
 	}
 
