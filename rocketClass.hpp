@@ -46,6 +46,7 @@ private:
 
   bool rollUp2Date;
   bool pitchUp2Date;
+  bool rollMatrixUp2Date;
 };
 
 #endif
