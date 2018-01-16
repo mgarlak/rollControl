@@ -1,43 +1,73 @@
+
 #include "rocketClass.hpp"
 
-double rocket::getSpeed(){
-    return sqrt(getSpeedSq());
-}
-double rocket::getSpeedSq(){
-    return xV*xV+yV*yV+zV*zV;
+rocket::rocket(){
+  // Orientation Data
+  //Q = {0, 0, 0, 0};
+  vQ = 0;
+  aQ = 0;
+  pitch = 0;
+  roll = 0;
+  rollRate = 0;
+  R = 0; // rotation matrix, stored beause it's frequently used.
+  // Location Data and Trajectory
+  // All values should be in ground frame.
+  x = 0;   // Position x
+  y = 0;   // Position y
+  z = 0;   // Altitude
+  xV = 0;  // Change in x
+  yV = 0;  // Change in y
+  zV = 0;  // Change in Altitude
+  xA = 0;  
+  yA = 0;  
+  zA = 0;  
+  rollUp2Date = false;
+  pitchUp2Date = false;
 }
 
-int rocket::updateSensorData(Adafruit_BMP280 bmp, Adafruit_BNO055 orient){
-  imu::Quaternion quat = orient.getQuat();
+double rocket::getSpeed(){
+  return sqrt(getSpeedSq());
+}
+double rocket::getSpeedSq(){
+  return xV*xV+yV*yV+zV*zV;
+}
+
+int rocket::updateSensorData(Adafruit_BNO055 &bno, Adafruit_BMP280 &baro){
+  imu::Quaternion quat = bno.getQuat();
   Q[0] = quat.x();
   Q[1] = quat.y();
   Q[2] = quat.z();
   Q[3] = quat.w();
-
-  z = bmp.readAltitude(1013.25 /*HARDCODED, WE'LL CHANGE LATER*/);
-
-  rollMatrixUp2Date=false;
+  z = baro.readAltitude(1013.25 /*HARDCODED, WE'LL CHANGE LATER*/);
+  pitchUp2Date = false;
+  rollUp2Date = false;
+  return 0;
 }
 
 double rocket::getPitch(){
-    if (!pitchUp2Date){
-        pitch=/*(right angle) - arccos(The dot product of the rocket-frame z unit vector and the ground frame z unit vector)*/;
-    }
-    return pitch;
+  if (!pitchUp2Date){
+    pitch= 0/*(right angle) - arccos(The dot product of the rocket-frame z unit vector and the ground frame z unit vector)*/;
+  }
+
+  pitchUp2Date = true;
+  return pitch;
 }
+
 double rocket::getRoll(){
-    if(!rollUp2Date){
-        roll=/*angle between the projection of the x unit vector in the rocket frame on the ground frame xy plane and the ground frame x direction*/;
-    }
-    return roll;
+  if(!rollUp2Date){
+    roll= 0/*angle between the projection of the x unit vector in the rocket frame on the ground frame xy plane and the ground frame x direction*/;
+  }
+
+  rollUp2Date = true;
+  return roll;
 }
 
 int rocket::updateRotMatrix(){
     double s=pow(Q[0]*Q[0]+Q[1]*Q[1]+Q[2]*Q[2]+Q[3]*Q[3],-2);
     
-    R[0][0]=1-2*s*(Q[1]*Q[1]+Q[2]*Q[2]); R[0][1]=2*s*(Q[1]*Q[2]-Q[3]*Q[0]); R[0][2]=2*s*(Q[1]*Q[3]+Q[2]*Q[0]);
-    R[1][0]=2*s*(Q[1]*Q[2]+Q[3]*Q[0]); R[1][1]=1-2*s*(Q[1]*Q[1]+Q[3]*Q[3]); R[1][2]=2*s*(Q[2]*Q[3]-Q[1]*Q[0]);
-    R[2][0]=2*s*(Q[1]*Q[2]+Q[2]*Q[0]); R[2][1]=2*s*(Q[2]*Q[3]+Q[1]*Q[0]); R[2][2]=1-2*s*(Q[1]*Q[1]+Q[2]*Q[2]);
+    R[0]=1-2*s*(Q[1]*Q[1]+Q[2]*Q[2]); R[1]=2*s*(Q[1]*Q[2]-Q[3]*Q[0]); R[2]=2*s*(Q[1]*Q[3]+Q[2]*Q[0]);
+    R[3]=2*s*(Q[1]*Q[2]+Q[3]*Q[0]); R[4]=1-2*s*(Q[1]*Q[1]+Q[3]*Q[3]); R[5]=2*s*(Q[2]*Q[3]-Q[1]*Q[0]);
+    R[6]=2*s*(Q[1]*Q[2]+Q[2]*Q[0]); R[7]=2*s*(Q[2]*Q[3]+Q[1]*Q[0]); R[8]=1-2*s*(Q[1]*Q[1]+Q[2]*Q[2]);
 
     rollMatrixUp2Date=true;
 
