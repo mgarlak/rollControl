@@ -30,7 +30,9 @@ private:
   double roll;
   double rollRate;
 
-  float R[9]; // rotation matrix, stored beause it's frequently used.
+  float R[9];     // rotation matrix, stored beause it's frequently used.
+  float up[3];    // points "up" in the ground frame.
+  float north[3]; // points "north" in the ground plane.
 
   // Location Data and Trajectory
   // All values should be in ground frame.
