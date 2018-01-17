@@ -65,15 +65,14 @@ double rocket::getRoll(){ //approximation.  To get exact version, need to also r
         float tempMatrix[9]={0};
         for(int i=0;i<9;++i) tempMatrix[i]=R[i]; //Need to copy the temp matrix
         Matrix.Multiply=((float *)tempMatrix,(float *)north);
-        
-        roll= atan(tempMatrix[0]/tempMatrix[3])
+        roll= atan(tempMatrix[0]/tempMatrix[1]);
     }
     rollUp2Date = true;
     return roll;
 }
 
 int rocket::updateRotMatrix(){
-    double s=pow(Q[0]*Q[0]+Q[1]*Q[1]+Q[2]*Q[2]+Q[3]*Q[3],-2);
+    double s=pow(Q[0]*Q[0]+Q[1]*Q[1]+Q[2]*Q[2]+Q[3]*Q[3],-1);
     
     R[0]=1-2*s*(Q[1]*Q[1]+Q[2]*Q[2]); R[1]=2*s*(Q[1]*Q[2]-Q[3]*Q[0]); R[2]=2*s*(Q[1]*Q[3]+Q[2]*Q[0]);
     R[3]=2*s*(Q[1]*Q[2]+Q[3]*Q[0]); R[4]=1-2*s*(Q[1]*Q[1]+Q[3]*Q[3]); R[5]=2*s*(Q[2]*Q[3]-Q[1]*Q[0]);
