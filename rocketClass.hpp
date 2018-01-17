@@ -5,8 +5,7 @@
 #ifndef _ROCKET_HPP_
 #define _ROCKET_HPP_
 
-class rocket
-{
+class rocket {
 public:
     rocket();
     ~rocket();

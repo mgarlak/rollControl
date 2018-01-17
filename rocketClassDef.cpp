@@ -29,11 +29,37 @@ rocket::rocket(){
     pitchUp2Date = false;
 }
 
+rocket::rocket(){
+	// Orientation Data
+	Q = NULL;
+	vQ = NULL;
+	aQ = NULL;
+	pitch = 0;
+	roll = 0;
+	rollRate = 0;
+	R = NULL // rotation matrix, stored beause it's frequently used.
+	// Location Data and Trajectory
+	// All values should be in ground frame.
+	x = 0;   // Position x
+	y = 0;   // Position y
+	z = 0;   // Altitude
+	xV = 0;  // Change in x
+	yV = 0;  // Change in y
+	zV = 0;  // Change in Altitude
+	xA = 0;  
+	yA = 0;  
+	zA = 0;  
+	rollUp2Date = false;
+	pitchUp2Date = false;
+	Adafruit_BMP280 bmp;
+	Adafruit_BNO055 orient = Adafruit_BNO055(55);
+}
+
 double rocket::getSpeed(){
-    return sqrt(getSpeedSq());
+	return sqrt(getSpeedSq());
 }
 double rocket::getSpeedSq(){
-    return xV*xV+yV*yV+zV*zV;
+	return xV*xV+yV*yV+zV*zV;
 }
 
 int rocket::updateSensorData(Adafruit_BNO055 &bno, Adafruit_BMP280 &baro){
@@ -85,5 +111,5 @@ int rocket::updateRotMatrix(){
 }
 
 double rocket::getRollRate(){
-    //Should be nearly identical to get roll, except using vQ instead of Q. 
+	//Should be nearly identical to get roll, except using vQ instead of Q. 
 }

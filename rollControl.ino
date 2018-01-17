@@ -2,26 +2,21 @@
 #include "rocketClassDef.cpp"
 
 int flightMode;
-Adafruit_BMP280 bmp;
-Adafruit_BNO055 orient;
+rocket hprcRock;
 
 void setup() {
-  // put your setup code here, to run once:
-  flightMode=0;
+	// put your setup code here, to run once:
+	// Initilize hprcRock here.
+	flightMode=0;
 }
 
 
 
 void loop() {
-  //any code that needs to run every loop regardless of flightMode.
-	if (updateSensorData(bmp, orient) < 0){
-		double* qt = getQ();
+	//any code that needs to run every loop regardless of flightMode.
 
-    Serial.println("PRINTING QUATERION:");
-    Serial.println(qt[0]);
-    Serial.println(qt[1]);
-    Serial.println(qt[2]);
-    Serial.println(qt[3]);
+	if (hprcRock.updateSensorData() < 0){
+		double* qt = hprcRock.getQ();
 
     Serial.println("PRINTING ALTITUDE:");
     Serial.println(getz())
