@@ -60,11 +60,11 @@ double rocket::getPitch(){
     return pitch;
 }
 
-double rocket::getRoll(){
+double rocket::getRoll(){ //approximation.  To get exact version, need to also rotate north such that it's in the ground plane (i.e. up in rocket frame is up in rocket frame)
     if(!rollUp2Date){
         float tempMatrix[9]={0};
         for(int i=0;i<9;++i) tempMatrix[i]=R[i]; //Need to copy the temp matrix
-        Matrix.Multiply=((float *)tempMatrix,(float *)up);
+        Matrix.Multiply=((float *)tempMatrix,(float *)north);
         
         roll= atan(tempMatrix[0]/tempMatrix[3])
     }
