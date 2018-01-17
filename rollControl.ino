@@ -18,35 +18,27 @@ void loop() {
 	if (hprcRock.updateSensorData() < 0){
 		double* qt = hprcRock.getQ();
 
-		Serial.println("PRINTING QUATERION:");
-		Serial.println(qt[0]);
-		Serial.println(qt[1]);
-		Serial.println(qt[2]);
-		Serial.println(qt[3]);
-
-		Serial.println("PRINTING ALTITUDE:");
-		Serial.println(hprcRock.getz());
+    Serial.println("PRINTING ALTITUDE:");
+    Serial.println(getz())
 
 	}
-
-	switch (flightMode){
-		case 0 : 
-			//On the ground
-			break;
-		case 1:
-			//boost phase
-			break;
-		case 2:
-			//Coast phase, where we control roll
-			break;
-		case 3:
-			//Decent phase, initial
-			break;
-		case 4:
-			//Decent phase, after main chute deply
-			break;
-		case 5:
-			//on ground
-			break;
-	}
+  case(flightMode){
+    case 0 : 
+      //On the ground
+      break;
+    case 1:
+      //boost phase
+      break;
+    case 2:
+      //Coast phase, where we control roll
+      break;
+    case 3:
+      //Decent phase, initial
+      break;
+    case 4:
+      //Decent phase, after main chute deply
+      break;
+    case 5:
+      //on ground
+  }
 }
