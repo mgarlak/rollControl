@@ -54,7 +54,7 @@ double rocket::getPitch(){
         for(int i=0;i<9;++i) tempMatrix[i]=R[i]; //Need to copy the temp matrix
         Matrix.Multiply=((float *)tempMatrix,(float *)up);
         
-        pitch=acos(tempMatrix[0]*up[0]+tempMatrix[1]*up[1]+tempMatrix[2]+up[2]);
+        pitch=acos(tempMatrix[0]*up[0]+tempMatrix[3]*up[1]+tempMatrix[6]+up[2]);
     }
     pitchUp2Date = true;
     return pitch;
@@ -66,7 +66,7 @@ double rocket::getRoll(){
         for(int i=0;i<9;++i) tempMatrix[i]=R[i]; //Need to copy the temp matrix
         Matrix.Multiply=((float *)tempMatrix,(float *)up);
         
-        roll= atan(tempMatrix[0]/tempMatrix[1])
+        roll= atan(tempMatrix[0]/tempMatrix[3])
     }
     rollUp2Date = true;
     return roll;
