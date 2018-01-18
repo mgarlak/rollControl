@@ -8,8 +8,8 @@
 class rocket {
 public:
     rocket();
-    ~rocket();
-    int updateSensorData(Adafruit_BMP280, Adafruit_BNO055 /*Other Sensors*/);
+    ~rocket(){};
+    int updateSensorData(Adafruit_BNO055&, Adafruit_BMP280& /*Other Sensors*/);
     int logData();
     int updateRotMatrix();
     double getSpeed();
@@ -21,17 +21,19 @@ public:
     double* getQ() {return Q;};
 private:
     // Orientation Data
-    double Q[4];
-    double vQ[4];
-    double aQ[4];
+    double Q[4] {0,0,0,0};
+    double vQ[4] {0,0,0,0};
+    double aQ[4] {0,0,0,0};
 
     double pitch;
     double roll;
     double rollRate;
 
-    float R[9];     // rotation matrix, stored beause it's frequently used.
-    float up[3];    // points "up" in the ground frame.    Placeholder is 0,0,1
-    float north[3]; // points "north" in the ground plane. Placeholder is 1,0,0 or 0,1,0
+    float R[9]{0,0,0,
+         0,0,0,
+         0,0,0};     // rotation matrix, stored beause it's frequently used.
+    float up[3]{0,0,1};    // points "up" in the ground frame.    Placeholder is 0,0,1
+    float north[3]{1,0,0}; // points "north" in the ground plane. Placeholder is 1,0,0 or 0,1,0
 
     // Location Data and Trajectory
     // All values should be in ground frame.
