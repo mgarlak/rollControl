@@ -4,40 +4,10 @@
 #include <math.h>
 
 rocket::rocket(){
-    // Orientation Data
-    //Q = {0, 0, 0, 0};
-    vQ = 0;
-    aQ = 0;
-    pitch = 0;
-    roll = 0;
-    rollRate = 0;
-    R = {0,0,0
-         0,0,0
-         0,0,0};
-    up={0,0,1};//placeholder!
-    north={1,0,0};//Placeholder!
-    x = 0;   // Position x
-    y = 0;   // Position y
-    z = 0;   // Altitude
-    xV = 0;  // Change in x
-    yV = 0;  // Change in y
-    zV = 0;  // Change in Altitude
-    xA = 0;  
-    yA = 0;  
-    zA = 0;  
-    rollUp2Date = false;
-    pitchUp2Date = false;
-}
-
-rocket::rocket(){
 	// Orientation Data
-	Q = NULL;
-	vQ = NULL;
-	aQ = NULL;
 	pitch = 0;
 	roll = 0;
 	rollRate = 0;
-	R = NULL // rotation matrix, stored beause it's frequently used.
 	// Location Data and Trajectory
 	// All values should be in ground frame.
 	x = 0;   // Position x
@@ -72,27 +42,28 @@ int rocket::updateSensorData(Adafruit_BNO055 &bno, Adafruit_BMP280 &baro){
     pitchUp2Date = false;
     rollUp2Date = false;
     return 0;
-  }
+}
 
 double rocket::getPitch(){
-    if (!pitchUp2Date){
+    /*if (!pitchUp2Date){
         float tempMatrix[9]={0};
         for(int i=0;i<9;++i) tempMatrix[i]=R[i]; //Need to copy the temp matrix
-        Matrix.Multiply=((float *)tempMatrix,(float *)up);
+        Matrix.Multiply((float *)tempMatrix,(float *)up);
         
         pitch=acos(tempMatrix[0]*up[0]+tempMatrix[3]*up[1]+tempMatrix[6]+up[2]);
     }
-    pitchUp2Date = true;
+    pitchUp2Date = true;*/
     return pitch;
 }
 
 double rocket::getRoll(){
     if(!rollUp2Date){
-        float tempMatrix[9]={0};
-        for(int i=0;i<9;++i) tempMatrix[i]=R[i]; //Need to copy the temp matrix
-        Matrix.Multiply=((float *)tempMatrix,(float *)up);
+        //float tempMatrix[9]={0};
+        float rocketNorth[3]={0};
+        //for(int i=0;i<9;++i) tempMatrix[i]=R[i]; //Need to copy the temp matrix
+        Matrix.Multiply((float *)R,(float *)north,3,3,1,(float*)rocketNorth);
         
-        roll= atan(tempMatrix[0]/tempMatrix[3])
+        roll= atan(rocketNorth[0]/rocketNorth[1]);
     }
     rollUp2Date = true;
     return roll;
