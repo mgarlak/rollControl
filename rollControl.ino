@@ -1,5 +1,6 @@
 #include "rocketClass.hpp"
 #include "rocketClassDef.cpp"
+#include "flightplan.hpp"
 
 int flightMode;
 Adafruit_BMP280 bmp;
@@ -10,7 +11,9 @@ void setup() {
   flightMode=0;
 }
 
-
+double goalTorque(const rocket&, const flightplan &);
+double detlaTorque(double tau, const rocket&);
+double finAngle(double tau, const rocket &);
 
 void loop() {
   //any code that needs to run every loop regardless of flightMode.
