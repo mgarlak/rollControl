@@ -1,6 +1,9 @@
 #include <Adafruit_BNO055.h>
 #include <Adafruit_BMP280.h>
 #include <Adafruit_Sensor.h>
+#include <Servo.h>
+#include <MatrixMath.h>
+#include <math.h>
 
 #ifndef _ROCKET_HPP_
 #define _ROCKET_HPP_
