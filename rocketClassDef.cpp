@@ -1,7 +1,4 @@
-
 #include "rocketClass.hpp"
-#include <MatrixMath.h>
-#include <math.h>
 
 rocket::rocket(){
 	// Orientation Data
@@ -60,8 +57,10 @@ double rocket::getRoll(){
     if(!rollUp2Date){
         //float tempMatrix[9]={0};
         float rocketNorth[3]={0};
+        Matrix.Print((float*)rocketNorth,3,1,"n");
         //for(int i=0;i<9;++i) tempMatrix[i]=R[i]; //Need to copy the temp matrix
         Matrix.Multiply((float *)R,(float *)north,3,3,1,(float*)rocketNorth);
+        Matrix.Print((float*)rocketNorth,3,1,"n");
         
         roll= atan(rocketNorth[0]/rocketNorth[1]);
     }
