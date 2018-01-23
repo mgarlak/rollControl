@@ -1,4 +1,5 @@
 #include "rocketClass.hpp"
+#define servoPin 8
 
 int flightMode;
 rocket hprcRock;
@@ -6,7 +7,11 @@ rocket hprcRock;
 Adafruit_BMP280 bmp;
 Adafruit_BNO055 orient = Adafruit_BNO055(55);
 
+Servo ailerons;
+
  void setup() {
+    ailerons.attach(servoPin);
+    
     // put your setup code here, to run once:
     Serial.begin(9600);
     if(!orient.begin()) {
@@ -22,8 +27,6 @@ Adafruit_BNO055 orient = Adafruit_BNO055(55);
     flightMode=0;
 }
 
-
-
 void loop() {
    //any code that needs to run every loop regardless of flightMode.
     if (hprcRock.updateSensorData(orient, bmp) == 0){
@@ -38,6 +41,7 @@ void loop() {
         Serial.println("PRINTING ALTITUDE:");
         Serial.println(hprcRock.getz());
     }
+    Serial.println(hprcRock.getRoll());
     switch (flightMode){
         case 0 : 
           //On the ground
