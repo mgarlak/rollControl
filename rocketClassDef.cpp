@@ -20,6 +20,8 @@ rocket::rocket(){
 	pitchUp2Date = false;
 	Adafruit_BMP280 bmp;
 	Adafruit_BNO055 orient = Adafruit_BNO055(55);
+    model.omega = 0;
+    model.moi = 0;
 }
 
 double rocket::getSpeed(){
@@ -83,3 +85,28 @@ int rocket::updateRotMatrix(){
 double rocket::getRollRate(){
 	//Should be nearly identical to get roll, except using vQ instead of Q. 
 }
+
+int parseConfig(char* fname, int numOfParams){
+    File file = SD.open(fname);
+    if (file){
+        int property = 0;
+        while (file.available()){
+            char ch = file.read();
+            if (ch == '\n' && property != numOfParams){ /*Then we know we have a full number value*/
+                double val;
+                /*convert char array/string to double*/
+                switch (property){  /*Add new cases depending on how many properties are in the config file*/
+                    case 0: model.omega = val; break;
+                    case 1: model.moi = val; break;
+                }
+            }
+            else if (ch == '\n' && property != numOfParams){  /*Iterated over all the properties except flight plan*/
+                /*get flight plan*/
+            }
+            else
+                /*Append character to previous*/
+            ++property;
+        }
+    }
+}
+
