@@ -41,6 +41,15 @@ int getNumberFromChars(char* c, int n)
 
 // Utility Functions for Config Parsing
 
+bool isFpVital(char e){
+    if (isDigit(e)) return true;
+    if (e == '.') return true;
+    if(e == '+') return true;
+    if (e == '-') return true;
+    if (e == '~') return true;
+    if (e == '#') return true;
+    return false;
+}
 
 int getCaSize(char* str){
     int i = 0;
@@ -51,7 +60,7 @@ int getCaSize(char* str){
 
 char* caAppend(char* in, char e){
     /*Appends to a char* allocated on the heap*/
-    if (in == NULL){
+    if (in == nullptr){
         in = new char[2];
         in[0] = e;
         in[1] = '\0';
