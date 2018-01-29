@@ -1,15 +1,12 @@
 #include "rocketClass.hpp"
 #define servoPin 8
 #define sdPin 4
-
 int flightMode;
 rocket hprcRock;
-
 Adafruit_BMP280 bmp;
 Adafruit_BNO055 orient = Adafruit_BNO055(55);
 
 Servo ailerons;
-File config;
 
 void setup() {
     ailerons.attach(servoPin);
@@ -22,17 +19,18 @@ void setup() {
     }
     //Attempting to Integrate SD. Ignore for now
     Serial.println("SD Card initialization successful.");
+    hprcRock.parseConfig("rocket.config, 4");
     */
     if (!orient.begin()){
-        Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+        Serial.print("No BNO");
         while(1);
     }
-    Serial.println("BNO055 initialization successful.");
+    //Serial.println("BNO055 initialization successful.");
     if (!bmp.begin()){  
-        Serial.println(F("Could not find a valid BMP280 sensor, check wiring!"));
+        Serial.println(F("No BMP"));
         while (1);
     }
-    Serial.println("BMP280 initialization successful.");
+    //Serial.println("BMP280 initialization successful.");
     flightMode=0;
 }
 
