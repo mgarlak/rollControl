@@ -65,7 +65,7 @@ char* caAppend(char* in, char e){
         in[0] = e;
         in[1] = '\0';
         return in;
-    }
+    } 
     else{
         int size = getCaSize(in);
         char* temp = new char[size+2];

@@ -24,10 +24,10 @@ rocket::rocket(){
     model.moi = 0;
 }
 
-double rocket::getSpeed(){
+float rocket::getSpeed(){
 	return sqrt(getSpeedSq());
 }
-double rocket::getSpeedSq(){
+float rocket::getSpeedSq(){
 	return xV*xV+yV*yV+zV*zV;
 }
 
@@ -43,7 +43,7 @@ int rocket::updateSensorData(Adafruit_BNO055 &bno, Adafruit_BMP280 &baro){
     return 0;
 }
 
-double rocket::getPitch(){
+float rocket::getPitch(){
     /*if (!pitchUp2Date){
         float tempMatrix[9]={0};
         for(int i=0;i<9;++i) tempMatrix[i]=R[i]; //Need to copy the temp matrix
@@ -55,7 +55,7 @@ double rocket::getPitch(){
     return pitch;
 }
 
-double rocket::getRoll(){
+float rocket::getRoll(){
     if(!rollUp2Date){
         //float tempMatrix[9]={0};
         float rocketNorth[3]={0};
@@ -71,7 +71,7 @@ double rocket::getRoll(){
 }
 
 int rocket::updateRotMatrix(){
-    double s=pow(Q[0]*Q[0]+Q[1]*Q[1]+Q[2]*Q[2]+Q[3]*Q[3],-2);
+    float s=pow(Q[0]*Q[0]+Q[1]*Q[1]+Q[2]*Q[2]+Q[3]*Q[3],-2);
     
     R[0]=1-2*s*(Q[1]*Q[1]+Q[2]*Q[2]); R[1]=2*s*(Q[1]*Q[2]-Q[3]*Q[0]); R[2]=2*s*(Q[1]*Q[3]+Q[2]*Q[0]);
     R[3]=2*s*(Q[1]*Q[2]+Q[3]*Q[0]); R[4]=1-2*s*(Q[1]*Q[1]+Q[3]*Q[3]); R[5]=2*s*(Q[2]*Q[3]-Q[1]*Q[0]);
@@ -82,45 +82,16 @@ int rocket::updateRotMatrix(){
     return 0;
 }
 
-double rocket::getRollRate(){
+float rocket::getRollRate(){
 	//Should be nearly identical to get roll, except using vQ instead of Q. 
 }
 
-int rocket::parseConfig(char* fname, int numOfParams){
-    File file = SD.open(fname);
-    if (file){
-        int property = 0;
-        if (property > numOfParams) return -1;
-        char* str = NULL;
-        while (file.available()){
-            char ch = file.read();
-            if (ch == '\n' && property < numOfParams){ /*Then we know we have a full number value*/
-                double val = catod(str);
-                switch (property){  /*Add new cases depending on how many properties are in the config file*/
-                    case 0: model.omega = val; break;
-                    case 1: model.moi = val; break;
-                    default: return -2;
-                }
-                delete[] str;
-                str = NULL;
-                ++property;
-            }
-            else if (ch == '\n'){  /*Iterated over all the properties except flight plan, property == numOfParams*/
-                /*get flight plan*/
-                // model.plan = flightPlan(str);
-            }
-            else if (isFpVital(ch)) { str = caAppend(str, ch); } 
-        }
-    }
-    else return -3;
-    return 0;
-}
 
-/*Converting a char aray to double (Found this online, dont know how well it works)*/
-double catod(char* num){
+/*Converting a char aray to float (Found this online, dont know how well it works)*/
+float catod(char* num){
     if (!num || !*num) return 0;
-    double rhs = 0;
-    double lhs = 0;
+    float rhs = 0;
+    float lhs = 0;
     int divisor = 1;
     int sign = 1;
     bool inFraction = false;
@@ -146,4 +117,34 @@ double catod(char* num){
         ++num;
     }
     return sign * (rhs + lhs/divisor);
+}
+
+int rocket::parseConfig(char* fname, int numOfParams){
+    File file = SD.open(fname);
+    if (file){
+        int property = 0;
+        if (property > numOfParams) return -1;
+        char* str = nullptr;
+        while (file.available()){
+            char ch = file.read();
+            if (ch == '\n' && property < numOfParams){ /*Then we know we have a full number value*/
+                float val = catod(str);
+                switch (property){  /*Add new cases depending on how many properties are in the config file*/
+                    case 0: model.omega = val; break;
+                    case 1: model.moi = val; break;
+                    default: return -2;
+                }
+                delete[] str;
+                str = nullptr;
+                ++property;
+            }
+            else if (ch == '\n'){  /*Iterated over all the properties except flight plan, property == numOfParams*/
+                /*get flight plan*/
+                // model.plan = flightPlan(str);
+            }
+            else if (isFpVital(ch)) { str = caAppend(str, ch); } 
+        }
+    }
+    else return -3;
+    return 0;
 }

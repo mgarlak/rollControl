@@ -37,7 +37,7 @@ void setup() {
 void loop() {
     //any code that needs to run every loop regardless of flightMode.
     if (hprcRock.updateSensorData(orient, bmp) == 0){
-        double* qt = hprcRock.getQ();
+        float* qt = hprcRock.getQ();
 
         Serial.println("PRINTING QUATERION:");
         Serial.println(qt[0]);

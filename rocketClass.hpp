@@ -12,11 +12,11 @@
 #define _ROCKET_HPP_
 
 struct ConfigParams {
-    double omega;
-    double moi;
+    float omega;
+    float moi;
     /*Insert new things as needed*/
     flightplan plan;
-}
+};
 
 class rocket {
 public:
@@ -26,22 +26,22 @@ public:
     int updateSensorData(Adafruit_BNO055&, Adafruit_BMP280& /*Other Sensors*/);
     int logData();
     int updateRotMatrix();
-    double getSpeed();
-    double getSpeedSq();
-    double getRoll();
-    double getRollRate();
-    double getPitch();
-    double getz() {return z;};
-    double* getQ() {return Q;};
+    float getSpeed();
+    float getSpeedSq();
+    float getRoll();
+    float getRollRate();
+    float getPitch();
+    float getz() {return z;};
+    float* getQ() {return Q;};
 private:
     // Orientation Data
-    double Q[4] {0,0,0,0};
-    double vQ[4] {0,0,0,0};
-    double aQ[4] {0,0,0,0};
+    float Q[4] {0,0,0,0};
+    float vQ[4] {0,0,0,0};
+    float aQ[4] {0,0,0,0};
 
-    double pitch;
-    double roll;
-    double rollRate;
+    float pitch;
+    float roll;
+    float rollRate;
 
     float R[9]{0,0,0,
                0,0,0,
@@ -51,15 +51,15 @@ private:
 
     // Location Data and Trajectory
     // All values should be in ground frame.
-    double x;
-    double y;
-    double z;
-    double xV;
-    double yV;
-    double zV;
-    double xA;
-    double yA;
-    double zA;
+    float x;
+    float y;
+    float z;
+    float xV;
+    float yV;
+    float zV;
+    float xA;
+    float yA;
+    float zA;
 
     bool rollUp2Date;
     bool pitchUp2Date;
