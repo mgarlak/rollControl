@@ -90,24 +90,30 @@ int rocket::parseConfig(char* fname, int numOfParams){
     File file = SD.open(fname);
     if (file){
         int property = 0;
-        char* number;
+        if (property > numOfParams) return -1;
+        char* str = NULL;
         while (file.available()){
             char ch = file.read();
             if (ch == '\n' && property < numOfParams){ /*Then we know we have a full number value*/
-                double val = catod(number);
+                double val = catod(str);
                 switch (property){  /*Add new cases depending on how many properties are in the config file*/
                     case 0: model.omega = val; break;
                     case 1: model.moi = val; break;
+                    default: return -2;
                 }
+                delete[] str;
+                str = NULL;
                 ++property;
             }
-            else if (ch == '\n' && property == numOfParams){  /*Iterated over all the properties except flight plan*/
+            else if (ch == '\n'){  /*Iterated over all the properties except flight plan, property == numOfParams*/
                 /*get flight plan*/
+                // model.plan = flightPlan(str);
             }
-            else if (!isDigit(ch) && ch != '.') continue; /*Handles #, +, -, ~, and all other non-digits with the exeption of '.'*/
-            else { caAppend(number, ch); }
+            else if (isFpVital(ch)) { str = caAppend(str, ch); } 
         }
     }
+    else return -3;
+    return 0;
 }
 
 /*Converting a char aray to double (Found this online, dont know how well it works)*/
@@ -140,8 +146,4 @@ double catod(char* num){
         ++num;
     }
     return sign * (rhs + lhs/divisor);
-}
-
-void caAppend(char* fc, int fcLen, char a){
-
 }
