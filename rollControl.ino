@@ -1,33 +1,43 @@
 #include "rocketClass.hpp"
-
+#define servoPin 8
+#define sdPin 4
 int flightMode;
 rocket hprcRock;
-
 Adafruit_BMP280 bmp;
 Adafruit_BNO055 orient = Adafruit_BNO055(55);
 
- void setup() {
-    // put your setup code here, to run once:
+Servo ailerons;
+
+void setup() {
+    ailerons.attach(servoPin);
     Serial.begin(9600);
-    if(!orient.begin()) {
-    /* There was a problem detecting the BNO055 ... check your connections */
-    Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
-    while(1);
-  }
-  
-  if (!bmp.begin()) {  
-    Serial.println(F("Could not find a valid BMP280 sensor, check wiring!"));
-    while (1);
-  }
+    /*
+    Serial.print("Initializing SD Card...");
+    if (!SD.begin(sdPin)){
+        Serial.println("Initialization Failed!");
+        while (1);
+    }
+    //Attempting to Integrate SD. Ignore for now
+    Serial.println("SD Card initialization successful.");
+    hprcRock.parseConfig("rocket.config, 4");
+    */
+    if (!orient.begin()){
+        Serial.print("No BNO");
+        while(1);
+    }
+    //Serial.println("BNO055 initialization successful.");
+    if (!bmp.begin()){  
+        Serial.println(F("No BMP"));
+        while (1);
+    }
+    //Serial.println("BMP280 initialization successful.");
     flightMode=0;
 }
 
-
-
 void loop() {
-   //any code that needs to run every loop regardless of flightMode.
+    //any code that needs to run every loop regardless of flightMode.
     if (hprcRock.updateSensorData(orient, bmp) == 0){
-        double* qt = hprcRock.getQ();
+        float* qt = hprcRock.getQ();
 
         Serial.println("PRINTING QUATERION:");
         Serial.println(qt[0]);
@@ -38,6 +48,7 @@ void loop() {
         Serial.println("PRINTING ALTITUDE:");
         Serial.println(hprcRock.getz());
     }
+    Serial.println(hprcRock.getRoll());
     switch (flightMode){
         case 0 : 
           //On the ground
@@ -57,5 +68,5 @@ void loop() {
         case 5:
           //on ground
           break;
-      }
+    }
 }

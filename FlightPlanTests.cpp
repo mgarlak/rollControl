@@ -1,4 +1,4 @@
-#include <cassert>
+/*#include <cassert>
 #include "flightplan.hpp"
 #include <iostream>
 
@@ -110,3 +110,4 @@ int main()
 
     return 0;
 }
+*/
