@@ -11,7 +11,7 @@ Servo ailerons;
 bool wireFlag = false;
 
 void setup() {
-    serialDump();
+    //serialDump();
     pinMode(commsRst, OUTPUT);
     pinMode(commsRst, HIGH);
     ailerons.attach(servoPin);
@@ -19,21 +19,16 @@ void setup() {
     Wire.begin(75);
 
     Serial.print(F("Initializing SD Card..."));
-    Wire.requestFrom(commsDevice, 1);
+    //Wire.requestFrom(commsDevice, 1);
+    //Serial.print(F("Foo"));
+    
+    resetDev(commsRst);
+    delay(1500);
+    Wire.requestFrom(commsDevice,1);
     char chk = Wire.read();
-    for (int i = 0; i < 2; ++i){
-        if (i == 0 && chk != '1'){
-            Serial.print(F("Syncronizing Comms Device..."));
-            resetDev(commsRst);
-            delay(1500);
-            Wire.requestFrom(commsDevice, 1);
-            chk = Wire.read();
-        }
-        else if (i == 1 && chk != '1') {
-            Serial.println(F("SD INIT ERROR"));
-            while (1);
-        }
-        else break;
+    if(chk!='1'){
+      Serial.print(F("No request"));
+      while(1);
     }
     Serial.println(F("SD Card initialization successful."));
 
@@ -48,7 +43,7 @@ void setup() {
         Serial.print(F("BNO FAILURE"));
         while(1);
     }
-    if (!bmp.begin()){  
+    if (!bmp.begin()){
         Serial.println(F("BMP FAILURE"));
         while (1);
     }
