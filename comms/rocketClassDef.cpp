@@ -121,7 +121,7 @@ int rocket::fillModel(int fpsize, int devName){
         Wire.requestFrom(commsDevice, numBytes);
         while (Wire.available()){
             char ch = Wire.read();
-            //if (ch == -1) break;
+            if (ch == -1) break;
             str = caAppend(str, ch);
         }
         switch (property){

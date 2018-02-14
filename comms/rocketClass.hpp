@@ -8,7 +8,7 @@
 
 #ifndef _ROCKET_HPP_
 #define _ROCKET_HPP_
-#define numOfCParams 4
+#define numOfCParams 3
 #define commsDevice 123
 #define fpacc 5
 #define numBytes 64

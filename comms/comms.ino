@@ -16,20 +16,22 @@ int cmdSqnc = 0;
 bool wireFlag = false;
 
 void setup(){
-  	SD.begin(sdPin);
+  Wire.begin(19);
+  SD.begin(sdPin);
 	Xbee.begin(9600);
 	Serial.begin(9600);
-	Wire.begin(123);
+
 
  	Serial.print(F("Waiting For Instruction..."));
-  	Wire.onRequest(requestHandler);
+  Wire.onRequest(requestHandler);
 }
 
 void loop(){
-    Wire.requestFrom(controlDevice, 20);
+    //Wire.requestFrom(controlDevice, 20);
 }
 
 void requestHandler(){
+    Serial.println("Received Request");
     switch (cmdSqnc){
         case 0: ackSD(); break;
         case 1: {sendParam(); break;}
