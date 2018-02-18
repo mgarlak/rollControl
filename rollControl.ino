@@ -1,6 +1,9 @@
 #include "rocketClass.hpp"
+<<<<<<< HEAD
 #include "rocketClassDef.cpp"
 #include "flightplan.hpp"
+=======
+>>>>>>> a77f2ac9e5ae5bc8f37119f07d1f69b6b20ec7f9
 
 int flightMode;
 Adafruit_BMP280 bmp;
