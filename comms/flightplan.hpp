@@ -1,11 +1,7 @@
 #ifndef FLIGHT_PLAN
 #define FLIGHT_PLAN
 
-// Utility Function Prototypes
-bool isFpVital(char);
-int getCaSize(char*);
-char* caAppend(char*, char);
-int pftoi(float&);
+#include"utillity.hpp"
 
 enum direction
 {

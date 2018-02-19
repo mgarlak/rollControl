@@ -80,39 +80,7 @@ float rocket::getRollRate(){
 }
 
 
-/*Converting a char aray to float (Found this online, dont know how well it works)*/
-float catof(char* num){
-    //Serial.println(num);
-    if (!num || !*num) return 0;
-    float rhs = 0;
-    float lhs = 0;
-    int divisor = 1;
-    int sign = 1;
-    bool inFraction = false;
-    if (*num == '-'){ ++num; sign = -1; }
-    else if (*num == '+'){ ++num; }
-    while (*num != '\0'){
-        if (isDigit(*num)){
-            if (inFraction){
-                divisor *= 10;
-                lhs += ((float)(*num - '0'))/divisor;
-            }
-            else{ 
-                rhs = rhs*10 + (*num - '0');
-            }
-        }
-        else if (*num == '.'){
-            if (inFraction)
-                return sign * (rhs + lhs);
-            else 
-                inFraction = true;
-        }
-        else 
-            return sign * (rhs + lhs);
-        ++num;
-    }
-    return sign * (rhs + lhs);
-}
+
 
 int rocket::fillModel(int fpsize, int devName){
     int property = 0;
