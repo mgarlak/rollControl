@@ -1,30 +1,25 @@
-#include <Adafruit_BNO055.h>
-#include <Adafruit_BMP280.h>
-#include <Adafruit_Sensor.h>
-#include <Servo.h>
 #include <MatrixMath.h>
 #include <math.h>
 #include "flightplan.hpp"
-#include <SPI.h>
-#include <SD.h>
+#include <Wire.h>
+#include <Adafruit_BNO055.h>
+#include <Adafruit_BMP280.h>
+#include <Adafruit_Sensor.h>
 
 #ifndef _ROCKET_HPP_
 #define _ROCKET_HPP_
-
-struct ConfigParams {
-    float omega;
-    float moi;
-    /*Insert new things as needed*/
-    flightplan plan;
-};
+#define numOfCParams 3
+#define commsDevice 19
+#define fpacc 5
+#define numBytes 64
 
 class rocket {
 public:
     rocket();
     ~rocket(){};
-    int parseConfig(char*, int);
-    int updateSensorData(Adafruit_BNO055&, Adafruit_BMP280& /*Other Sensors*/);
-    int logData();
+    int fillModel(int, int);
+    int updateSensorData(Adafruit_BNO055&, Adafruit_BMP280&);
+    int logData(char*, int);
     int updateRotMatrix();
     float getSpeed();
     float getSpeedSq();
@@ -51,21 +46,17 @@ private:
 
     // Location Data and Trajectory
     // All values should be in ground frame.
-    float x;
-    float y;
+
     float z;
-    float xV;
-    float yV;
     float zV;
-    float xA;
-    float yA;
-    float zA;
 
     bool rollUp2Date;
     bool pitchUp2Date;
     bool rollMatrixUp2Date;
 
-    ConfigParams model;
+    float omega;
+    float moi;
+    flightplan plan;
 };
 
 #endif
