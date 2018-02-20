@@ -1,4 +1,7 @@
+#ifndef FLIGHT_PLAN
+#define FLIGHT_PLAN
 
+#include"utillity.hpp"
 
 enum direction
 {
@@ -54,3 +57,5 @@ private:
     int numberOfFlightCommands;
     flightCommand* commands;
 };
+
+#endif

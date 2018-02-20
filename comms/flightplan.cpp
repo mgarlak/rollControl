@@ -1,44 +1,5 @@
 #include "flightplan.hpp"
 
-/// Utility Functions
-
-bool isDigit(char c)
-{
-    return '0' <= c && c <= '9';
-}
-
-bool areDigits(char* c, int n)
-{
-    for (int i = 0; i < n; ++i)
-    {
-        if (!isDigit(c[i]))
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-int appendCharDigit(int number, char c)
-{
-    if (isDigit(c))
-    {
-        number *= 10;
-        number += c - '0';
-    }
-    return number;
-}
-
-int getNumberFromChars(char* c, int n)
-{
-    int result = 0;
-    for (int i = 0; i < n; ++i)
-    {
-        result = appendCharDigit(result, c[i]);
-    }
-    return result;
-}
-
 
 ///flightplan Implementation
 

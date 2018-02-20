@@ -1,35 +1,27 @@
-
 #include "rocketClass.hpp"
-#include <MatrixMath.h>
-#include <math.h>
 
 rocket::rocket(){
-	// Orientation Data
-	pitch = 0;
-	roll = 0;
-	rollRate = 0;
-	// Location Data and Trajectory
-	// All values should be in ground frame.
-	x = 0;   // Position x
-	y = 0;   // Position y
-	z = 0;   // Altitude
-	xV = 0;  // Change in x
-	yV = 0;  // Change in y
-	zV = 0;  // Change in Altitude
-	xA = 0;  
-	yA = 0;  
-	zA = 0;  
-	rollUp2Date = false;
-	pitchUp2Date = false;
-	Adafruit_BMP280 bmp;
-	Adafruit_BNO055 orient = Adafruit_BNO055(55);
+	  // Orientation Data
+	  pitch = 0;
+	  roll = 0;
+	  rollRate = 0;
+	  // Location Data and Trajectory
+	  // All values should be in ground frame.
+	  z = 0;   // Altitude
+	  zV = 0;  // Change in Altitude
+	  rollUp2Date = false;
+	  pitchUp2Date = false;
+	  Adafruit_BMP280 bmp;
+	  Adafruit_BNO055 orient = Adafruit_BNO055(55);
+    omega = 0;
+    moi = 0;
 }
 
-double rocket::getSpeed(){
+float rocket::getSpeed(){
 	return sqrt(getSpeedSq());
 }
-double rocket::getSpeedSq(){
-	return xV*xV+yV*yV+zV*zV;
+float rocket::getSpeedSq(){
+	return 0;
 }
 
 int rocket::updateSensorData(Adafruit_BNO055 &bno, Adafruit_BMP280 &baro){
@@ -44,7 +36,7 @@ int rocket::updateSensorData(Adafruit_BNO055 &bno, Adafruit_BMP280 &baro){
     return 0;
 }
 
-double rocket::getPitch(){
+float rocket::getPitch(){
     /*if (!pitchUp2Date){
         float tempMatrix[9]={0};
         for(int i=0;i<9;++i) tempMatrix[i]=R[i]; //Need to copy the temp matrix
@@ -56,12 +48,14 @@ double rocket::getPitch(){
     return pitch;
 }
 
-double rocket::getRoll(){ //approximation.  To get exact version, need to also rotate north such that it's in the ground plane (i.e. up in rocket frame is up in rocket frame)
+float rocket::getRoll(){
     if(!rollUp2Date){
         //float tempMatrix[9]={0};
         float rocketNorth[3]={0};
+        Matrix.Print((float*)rocketNorth,3,1,"n");
         //for(int i=0;i<9;++i) tempMatrix[i]=R[i]; //Need to copy the temp matrix
         Matrix.Multiply((float *)R,(float *)north,3,3,1,(float*)rocketNorth);
+        Matrix.Print((float*)rocketNorth,3,1,"n");
         
         roll= atan(rocketNorth[0]/rocketNorth[1]);
     }
@@ -70,7 +64,7 @@ double rocket::getRoll(){ //approximation.  To get exact version, need to also r
 }
 
 int rocket::updateRotMatrix(){
-    double s=pow(Q[0]*Q[0]+Q[1]*Q[1]+Q[2]*Q[2]+Q[3]*Q[3],-1);
+    float s=pow(Q[0]*Q[0]+Q[1]*Q[1]+Q[2]*Q[2]+Q[3]*Q[3],-2);
     
     R[0]=1-2*s*(Q[1]*Q[1]+Q[2]*Q[2]); R[1]=2*s*(Q[1]*Q[2]-Q[3]*Q[0]); R[2]=2*s*(Q[1]*Q[3]+Q[2]*Q[0]);
     R[3]=2*s*(Q[1]*Q[2]+Q[3]*Q[0]); R[4]=1-2*s*(Q[1]*Q[1]+Q[3]*Q[3]); R[5]=2*s*(Q[2]*Q[3]-Q[1]*Q[0]);
@@ -81,6 +75,37 @@ int rocket::updateRotMatrix(){
     return 0;
 }
 
-double rocket::getRollRate(){
+float rocket::getRollRate(){
 	//Should be nearly identical to get roll, except using vQ instead of Q. 
+}
+
+
+
+
+int rocket::fillModel(int fpsize, int devName){
+    int property = 0;
+    while (property < numOfCParams){
+        char* str = nullptr;
+        Wire.requestFrom(commsDevice, numBytes);
+        while (Wire.available()){
+            char ch = Wire.read();
+            if (ch == -1) break;
+            str = caAppend(str, ch);
+        }
+        switch (property){
+            case 0: omega = catof(str); break;
+            case 1: moi = catof(str); break;
+            case 2: plan.parseFlightPlan(str); break;
+        }
+        {
+          delete[] str;
+          str = nullptr;
+        }
+        ++property;
+    }
+    return 0;
+}
+
+int rocket::logData(char* fname, int floatSize){
+    
 }
