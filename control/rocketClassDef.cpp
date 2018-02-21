@@ -1,5 +1,12 @@
 #include "rocketClass.hpp"
 
+//Readability aid macros:
+#define q_x Q[0]
+#define q_y Q[1]
+#define q_z Q[2]
+#define q_w Q[3]
+#define SQ(x) x*x
+
 rocket::rocket(){
 	  // Orientation Data
 	  pitch = 0;
@@ -26,10 +33,10 @@ float rocket::getSpeedSq(){
 
 int rocket::updateSensorData(Adafruit_BNO055 &bno, Adafruit_BMP280 &baro){
     imu::Quaternion quat = bno.getQuat();
-    Q[0] = quat.x();
-    Q[1] = quat.y();
-    Q[2] = quat.z();
-    Q[3] = quat.w();
+    q_x = quat.x();
+    q_y = quat.y();
+    q_z = quat.z();
+    q_w = quat.w();
     z = baro.readAltitude(1013.25 /*HARDCODED, WE'LL CHANGE LATER*/);
     pitchUp2Date = false;
     rollUp2Date = false;
@@ -50,10 +57,8 @@ float rocket::getPitch(){
 
 float rocket::getRoll(){
     if(!rollUp2Date){
-        //float tempMatrix[9]={0};
         float rocketNorth[3]={0};
         Matrix.Print((float*)rocketNorth,3,1,"n");
-        //for(int i=0;i<9;++i) tempMatrix[i]=R[i]; //Need to copy the temp matrix
         Matrix.Multiply((float *)R,(float *)north,3,3,1,(float*)rocketNorth);
         Matrix.Print((float*)rocketNorth,3,1,"n");
         
@@ -63,12 +68,13 @@ float rocket::getRoll(){
     return roll;
 }
 
-int rocket::updateRotMatrix(){
-    float s=pow(Q[0]*Q[0]+Q[1]*Q[1]+Q[2]*Q[2]+Q[3]*Q[3],-2);
+int rocket::updateRotMatrix(){    
+    float q =  (SQ(q_x) + SQ(q_y) + SQ(q_z) + SQ(q_w));//Magnatude of the quaternion squared;
+    float s = (q == 0) ? 1 : (1.0 / q);
     
-    R[0]=1-2*s*(Q[1]*Q[1]+Q[2]*Q[2]); R[1]=2*s*(Q[1]*Q[2]-Q[3]*Q[0]); R[2]=2*s*(Q[1]*Q[3]+Q[2]*Q[0]);
-    R[3]=2*s*(Q[1]*Q[2]+Q[3]*Q[0]); R[4]=1-2*s*(Q[1]*Q[1]+Q[3]*Q[3]); R[5]=2*s*(Q[2]*Q[3]-Q[1]*Q[0]);
-    R[6]=2*s*(Q[1]*Q[2]+Q[2]*Q[0]); R[7]=2*s*(Q[2]*Q[3]+Q[1]*Q[0]); R[8]=1-2*s*(Q[1]*Q[1]+Q[2]*Q[2]);
+    R[0] = 1 - 2 * s*(SQ(q_y) + SQ(q_z)); R[1] = 2 * s*(q_x*q_y - q_z*q_w); R[2] = 2 * s*(q_x*q_z+q_y*q_w);
+	R[3] = 2 * s*(q_x*q_y+q_z*q_w); R[4] = 1 - 2 * s*(Q[0] * Q[0] + Q[2] * Q[2]); R[5] = 2 * s*(q_y*q_z-q_x*q_w);
+	R[6] = 2 * s*(q_x*q_z + q_y * q_w); R[7] = 2 * s*(q_y*q_z + q_x * q_w); R[8] = 1 - 2 * s*(SQ(q_x) + SQ(q_y));
 
     rollMatrixUp2Date=true;
 
