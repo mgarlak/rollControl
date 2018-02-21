@@ -2,6 +2,7 @@
 #define UTILLITY_CPP
 
 #include"utillity.hpp"
+#include"math.h"
 
 float toFloat(unsigned char * c){
 
@@ -148,6 +149,25 @@ float catof(char* num){
         ++num;
     }
     return sign * (rhs + lhs);
+}
+
+void cross(float* a,float* b,float* c){
+    c[0]=a[1]*b[2]-a[2]*b[1];
+    c[1]=a[2]*b[0]-a[0]*b[2];
+    c[2]=a[0]*b[1]-a[1]*b[0];
+}
+
+float vecMag(float *v,char len){
+    float result=0;
+    for(char i=0; i<len; ++i) result+=v[i]*v[i];
+    return sqrt(result);
+}
+
+void normalize(float* a,float*b){
+    float vecAMag=vecMag(a,3);
+    b[0]=a[0]/vecAMag;
+    b[1]=a[1]/vecAMag;
+    b[2]=a[2]/vecAMag;
 }
 
 #endif
