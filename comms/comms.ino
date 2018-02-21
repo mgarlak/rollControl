@@ -1,14 +1,15 @@
-//#include "rocketClass.hpp"
-#include "flightplan.hpp"
+#include "utillity.hpp"
 #include <SoftwareSerial.h>
 #include <SPI.h>
 #include <SD.h>
 #include <Wire.h>
+
 #define configFile "ROCKETCF.TXT"
 #define flightLog "flogger1.txt"
 #define sdPin 10
 #define fpacc 5
 #define controlDevice 75
+
 SoftwareSerial Xbee(2,3); //Rx, Tx
 File configf;
 File logger;
@@ -19,7 +20,7 @@ void setup(){
   	SD.begin(sdPin);
 	Xbee.begin(9600);
 	Serial.begin(9600);
-	Wire.begin(123);
+	Wire.begin(19);
 
  	Serial.print(F("Waiting For Instruction..."));
   	Wire.onRequest(requestHandler);
@@ -27,12 +28,24 @@ void setup(){
 
 void loop(){
     Wire.requestFrom(controlDevice, 20);
+    char data[22] = "";
+    data[22] = '\0';
+    int i = 0;
+    while (Wire.available() && i < 22){
+        str[i] = wire.read();
+        CONVERT str[i];
+        INSERT CHECKS HERE (IE str[i] == '\0')
+        ++i;
+    }
+    logSD(data)
+    transmitXbee(data);
 }
 
 void requestHandler(){
+    Serial.print("IN REQUEST HANDLER");
     switch (cmdSqnc){
         case 0: ackSD(); break;
-        case 1: {sendParam(); break;}
+        case 1: sendParam(); break;
         default: {}
     }
 }
