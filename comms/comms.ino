@@ -37,18 +37,6 @@ void loop(){
         ++i;
     }
 
-    // Now convert
-    /*char qChar[5][4];
-    i = 0;
-    int j = 0;
-    int k = 0;
-    while (i < 5){
-        if (j%4 == 0) {j = 0; ++i;}
-        qChar[i][j] = data[k];
-        ++j; ++k;
-    }
-    */
-    // log and transmit
     logSD(data);
     transmitXbee(data);
 }
