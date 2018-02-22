@@ -27,17 +27,29 @@ void setup(){
 }
 
 void loop(){
-    Wire.requestFrom(controlDevice, 20);
-    char data[22] = "";
+    // read data
+    Wire.requestFrom(controlDevice, 21);
+    char data[22];
     data[22] = '\0';
     int i = 0;
     while (Wire.available() && i < 22){
-        str[i] = wire.read();
-        CONVERT str[i];
-        INSERT CHECKS HERE (IE str[i] == '\0')
+        data[i] = wire.read();
         ++i;
     }
-    logSD(data)
+
+    // Now convert
+    /*char qChar[5][4];
+    i = 0;
+    int j = 0;
+    int k = 0;
+    while (i < 5){
+        if (j%4 == 0) {j = 0; ++i;}
+        qChar[i][j] = data[k];
+        ++j; ++k;
+    }
+    */
+    // log and transmit
+    logSD(data);
     transmitXbee(data);
 }
 
@@ -88,4 +100,13 @@ void sendParam(){
 
 void sendAck(){
     Wire.write('1');
+}
+
+void logSD(char* str){
+    if (!logger){ logger = SD.open(flightLog); }
+    logger.println(str, HEX);
+}
+
+void transmitXbee(char* str){
+    Xbee.print(str, HEX);
 }
