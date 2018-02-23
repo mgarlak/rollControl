@@ -13,6 +13,8 @@
 #define fpacc 5
 #define numBytes 64
 
+#define PI 2*asin(1)
+
 class rocket {
 public:
     rocket();
@@ -21,13 +23,22 @@ public:
     int updateSensorData(Adafruit_BNO055&, Adafruit_BMP280&);
     int logData(char*, int);
     int updateRotMatrix();
+
     float getSpeed();
     float getSpeedSq();
     float getRoll();
     float getRollRate();
     float getPitch();
     float getz() {return z;};
-    float* getQ() {return Q;};
+    float* getQ() {return (float*)Q;};
+
+    float getDampingConstant();
+    float getSpringConstant();
+
+    float getInherientTorque(); //TODO: impliment
+    int finAngle(float);
+
+    const flightplan& getPlan(){ return plan;}
 private:
     // Orientation Data
     float Q[4] {0,0,0,0};

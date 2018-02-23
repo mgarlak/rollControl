@@ -6,7 +6,7 @@
 #define q_z Q[2]
 #define q_w Q[3]
 #define SQ(x) x*x
-#define PI 2*asin(1)
+
 
 rocket::rocket(){
 	  // Orientation Data
