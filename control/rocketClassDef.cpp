@@ -19,6 +19,8 @@ rocket::rocket(){
 	  zV = 0;  // Change in Altitude
 	  rollUp2Date = false;
 	  pitchUp2Date = false;
+      rollMatrixUp2Date = false;
+      speedUp2Date = false;
 	  Adafruit_BMP280 bmp;
 	  Adafruit_BNO055 orient = Adafruit_BNO055(55);
     omega = 0;
@@ -26,10 +28,14 @@ rocket::rocket(){
 }
 
 float rocket::getSpeed(){
-	return sqrt(getSpeedSq());
+	if(!speedUp2Date){
+        zV=(1000.0*(z-oldZ)/float(deltaT))/cos(getPitch());
+        speedUp2Date=true
+    }
+    return zV;
 }
 float rocket::getSpeedSq(){
-	return 0;
+	return SQ(getSpeed());
 }
 
 int rocket::updateSensorData(Adafruit_BNO055 &bno, Adafruit_BMP280 &baro){
@@ -43,25 +49,27 @@ int rocket::updateSensorData(Adafruit_BNO055 &bno, Adafruit_BMP280 &baro){
         q_y = quat.y();
         q_z = quat.z();
         q_w = quat.w();
+        oldZ=z;
         z = baro.readAltitude(1013.25 /*HARDCODED, WE'LL CHANGE LATER.  ADD TO CONFIG*/);
 
         pitchUp2Date = false;
         rollUp2Date = false;
         rollMatrixUp2Date = false;
+        speedUp2Date = false;
         return 1;
     }
     return 0;
 }
 
 float rocket::getPitch(){
-    /*if (!pitchUp2Date){
-        float tempMatrix[9]={0};
-        for(int i=0;i<9;++i) tempMatrix[i]=R[i]; //Need to copy the temp matrix
-        Matrix.Multiply((float *)tempMatrix,(float *)up);
-        
-        pitch=acos(tempMatrix[0]*up[0]+tempMatrix[3]*up[1]+tempMatrix[6]+up[2]);
+    if (!pitchUp2Date){
+        /*
+        multiply up by the rotation matrix to get the direction the rocket is pointing.
+        take the dot product of up and rocketUp.  //Note: up and rocketUp must be unit vectors!
+        calculate pitch as the inverse sine of that dot product
+        */
     }
-    pitchUp2Date = true;*/
+    pitchUp2Date = true;
     return pitch;
 }
 

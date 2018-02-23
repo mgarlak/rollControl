@@ -51,11 +51,13 @@ private:
     // All values should be in ground frame.
 
     float z;
+    float oldZ;
     float zV;
 
     bool rollUp2Date;
     bool pitchUp2Date;
     bool rollMatrixUp2Date;
+    bool speedUp2Date;
 
     float omega;
     float moi;
