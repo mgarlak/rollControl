@@ -2,3 +2,5 @@
 CMakeLists.txt
 cmake-build-debug/
 test
+a.out
+control/flightplan.hpp.gch

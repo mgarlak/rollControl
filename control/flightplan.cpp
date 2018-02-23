@@ -54,10 +54,10 @@ flightCommand flightplan::operator[](int i) const
     return flightCommand();
 }
 
-void flightplan::hash()
-{
+//void flightplan::hash()
+//{
 
-}
+//}
 
 void flightplan::parseFlightPlan(char* plan)
 {
@@ -203,16 +203,7 @@ int flightplan::getTargetAngle(unsigned long time)
         return move.heading;
     }
 
-    int relativeRotation = 0;
-    if (move.rotationDirection == cw)
-    {
-        relativeRotation = move.heading - lastMove.heading;
-    }
-    else
-    {
-        relativeRotation = lastMove.heading - move.heading;
-    }
-
+    int relativeRotation = move.heading - lastMove.heading;
     unsigned long turnTime = time - moveStartTime;
     int progressAngle = relativeRotation * ((double) turnTime / (double) move.rollTime);
     int targetAngle = lastMove.heading + progressAngle;
