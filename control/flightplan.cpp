@@ -1,44 +1,5 @@
-#include <c++/6/iostream>
 #include "flightplan.hpp"
-
-/// Utility Functions
-
-bool isDigit(char c)
-{
-    return '0' <= c && c <= '9';
-}
-
-bool areDigits(char* c, int n)
-{
-    for (int i = 0; i < n; ++i)
-    {
-        if (!isDigit(c[i]))
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-int appendCharDigit(int number, char c)
-{
-    if (isDigit(c))
-    {
-        number *= 10;
-        number += c - '0';
-    }
-    return number;
-}
-
-int getNumberFromChars(char* c, int n)
-{
-    int result = 0;
-    for (int i = 0; i < n; ++i)
-    {
-        result = appendCharDigit(result, c[i]);
-    }
-    return result;
-}
+#include "utility.hpp"
 
 
 ///flightplan Implementation
@@ -166,13 +127,6 @@ void flightplan::beginRotation(unsigned long time)
 
 int flightplan::getTargetAngle(unsigned long time)
 {
-    if (currentMove < 0
-        || currentMove >= numberOfFlightCommands)
-    {
-        // return invalid angle.
-        return -1;
-    }
-
     // If finished the last move, progress to next stage.
     if (time > moveEndTime)
     {
@@ -182,6 +136,13 @@ int flightplan::getTargetAngle(unsigned long time)
         moveStartTime = moveEndTime;
         // Calculate and save end of next move.
         moveEndTime = moveStartTime + commands[currentMove].rollTime;
+    }
+
+    if (currentMove < 0
+        || currentMove >= numberOfFlightCommands)
+    {
+        // return holding angle.
+        return commands[numberOfFlightCommands-1].heading;
     }
 
     // Calculate the target angle.
@@ -214,6 +175,5 @@ int flightplan::getTargetAngle(unsigned long time)
     }
     targetAngle %= 360;
 
-    std::cerr << targetAngle << std::endl;
     return targetAngle;
 }
