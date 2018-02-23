@@ -115,11 +115,10 @@ int rocket::updateRotMatrix(){
         R[0] = 1 - 2 * s*(SQ(q_y) + SQ(q_z)); R[1] = 2 * s*(q_x*q_y - q_z*q_w); R[2] = 2 * s*(q_x*q_z+q_y*q_w);
 	    R[3] = 2 * s*(q_x*q_y+q_z*q_w); R[4] = 1 - 2 * s*(Q[0] * Q[0] + Q[2] * Q[2]); R[5] = 2 * s*(q_y*q_z-q_x*q_w);
 	    R[6] = 2 * s*(q_x*q_z + q_y * q_w); R[7] = 2 * s*(q_y*q_z + q_x * q_w); R[8] = 1 - 2 * s*(SQ(q_x) + SQ(q_y));
-
-        rollMatrixUp2Date=true;
+      
     }    
 
-
+    rollMatrixUp2Date=true;
     return 0;
 }
 
