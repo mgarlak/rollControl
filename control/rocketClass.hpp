@@ -38,6 +38,9 @@ private:
     float roll;
     float rollRate;
 
+    long lastUpdate;
+    int deltaT;
+
     float R[9]{0,0,0,
                0,0,0,
                0,0,0};     // rotation matrix, stored beause it's frequently used.

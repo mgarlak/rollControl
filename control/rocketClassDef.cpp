@@ -6,6 +6,7 @@
 #define q_z Q[2]
 #define q_w Q[3]
 #define SQ(x) x*x
+#define PI 2*asin(1)
 
 rocket::rocket(){
 	  // Orientation Data
@@ -57,36 +58,54 @@ float rocket::getPitch(){
 
 float rocket::getRoll(){
     if(!rollUp2Date){
+        updateRotMatrix();
+        float oldRoll=roll;
+
         float rocketNorth[3]={0};
+        float rocketUp[3]={0};
+
+        Matrix.Multiply((float *)R,(float *)up,3,3,1,(float*)rocketUp);
+        /*
+        take the cross product of rocketUp and up.  //The resulting vector points along the axis of rotation needed to digitally make the rocket point up.
+        get the angle between rocketUp and up using a cross b = a*b*sin(\theta)
+        normalize that vector.
+        using the angle and the normalized cross product, construct a quaternion.
+        using that quaternion, make a rotation matrix.
+        multiply the two rotation matricies to produce a new one //This will only rotate rocket north about up.
+        */
+
+        Matrix.Multiply((float *)R,(float *)north,3,3,1,(float*)rocketNorth);//TODO: swap R with the matrix mentioned above
         Matrix.Print((float*)rocketNorth,3,1,"n");
-        Matrix.Multiply((float *)R,(float *)north,3,3,1,(float*)rocketNorth);
-        Matrix.Print((float*)rocketNorth,3,1,"n");
-        
-        roll= atan(rocketNorth[0]/rocketNorth[1]);
+
+        if (rocketNorth[1]==0){
+            roll = rocketNorth[0]>0 ? PI/2.0 : (3.0/2.0)*PI;
+        } else roll= (rocketNorth[0]>0 ? 0 : PI) + atan(rocketNorth[0]/rocketNorth[1]);//TODO: make sure this accurately calculates roll for all angles
+        rollRate=1000.0*(roll-oldRoll)/float(deltaT);
     }
     rollUp2Date = true;
     return roll;
 }
 
-int rocket::updateRotMatrix(){    
-    float q =  (SQ(q_x) + SQ(q_y) + SQ(q_z) + SQ(q_w));//Magnatude of the quaternion squared;
-    float s = (q == 0) ? 1 : (1.0 / q);
+int rocket::updateRotMatrix(){
+    if(!rollMatrixUp2Date){
+        float q =  (SQ(q_x) + SQ(q_y) + SQ(q_z) + SQ(q_w));//Magnatude of the quaternion squared;
+        float s = (q == 0) ? 1 : (1.0 / q);
     
-    R[0] = 1 - 2 * s*(SQ(q_y) + SQ(q_z)); R[1] = 2 * s*(q_x*q_y - q_z*q_w); R[2] = 2 * s*(q_x*q_z+q_y*q_w);
-	R[3] = 2 * s*(q_x*q_y+q_z*q_w); R[4] = 1 - 2 * s*(Q[0] * Q[0] + Q[2] * Q[2]); R[5] = 2 * s*(q_y*q_z-q_x*q_w);
-	R[6] = 2 * s*(q_x*q_z + q_y * q_w); R[7] = 2 * s*(q_y*q_z + q_x * q_w); R[8] = 1 - 2 * s*(SQ(q_x) + SQ(q_y));
+        R[0] = 1 - 2 * s*(SQ(q_y) + SQ(q_z)); R[1] = 2 * s*(q_x*q_y - q_z*q_w); R[2] = 2 * s*(q_x*q_z+q_y*q_w);
+	    R[3] = 2 * s*(q_x*q_y+q_z*q_w); R[4] = 1 - 2 * s*(Q[0] * Q[0] + Q[2] * Q[2]); R[5] = 2 * s*(q_y*q_z-q_x*q_w);
+	    R[6] = 2 * s*(q_x*q_z + q_y * q_w); R[7] = 2 * s*(q_y*q_z + q_x * q_w); R[8] = 1 - 2 * s*(SQ(q_x) + SQ(q_y));
 
-    rollMatrixUp2Date=true;
+        rollMatrixUp2Date=true;
+    }    
+
 
     return 0;
 }
 
 float rocket::getRollRate(){
-	//Should be nearly identical to get roll, except using vQ instead of Q. 
+    getRoll();
+	return rollRate;
 }
-
-
-
 
 int rocket::fillModel(int fpsize, int devName){
     int property = 0;
