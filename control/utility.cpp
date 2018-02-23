@@ -158,9 +158,7 @@ void cross(float* a,float* b,float* c){
 }
 
 float vecMag(float *v,char len){
-    float result=0;
-    for(char i=0; i<len; ++i) result+=v[i]*v[i];
-    return sqrt(result);
+    return sqrt(dotProd(v,v))
 }
 
 void normalize(float* a,float*b){
@@ -168,6 +166,10 @@ void normalize(float* a,float*b){
     b[0]=a[0]/vecAMag;
     b[1]=a[1]/vecAMag;
     b[2]=a[2]/vecAMag;
+}
+
+float dotProd(float* a,float* b){
+    return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
 }
 
 #endif

@@ -63,11 +63,10 @@ int rocket::updateSensorData(Adafruit_BNO055 &bno, Adafruit_BMP280 &baro){
 
 float rocket::getPitch(){
     if (!pitchUp2Date){
-        /*
-        multiply up by the rotation matrix to get the direction the rocket is pointing.
-        take the dot product of up and rocketUp.  //Note: up and rocketUp must be unit vectors!
-        calculate pitch as the inverse sine of that dot product
-        */
+        rocketUp[3]={0};
+        Matrix.Multiply((float *)R,(float *)up,3,3,1,(float*)rocketUp);
+
+        pitch=asin(dotProd(up,rocketUp));
     }
     pitchUp2Date = true;
     return pitch;
@@ -97,9 +96,11 @@ float rocket::getRoll(){
         if (rocketNorth[1]==0){
             roll = rocketNorth[0]>0 ? PI/2.0 : (3.0/2.0)*PI;
         } else roll= (rocketNorth[0]>0 ? 0 : PI) + atan(rocketNorth[0]/rocketNorth[1]);//TODO: make sure this accurately calculates roll for all angles
-        if(oldRoll > 3.0/4.0*PI && roll < 1.0/4.0*PI){
+        
+        //Calculate roll rate:
+        if(oldRoll > 3.0/2.0*PI && roll < 1.0/4.0*PI){
             rollRate=1000.0*(roll-oldRoll+2.0*PI)/float(deltaT);
-        } else if(roll > 3.0/4.0*PI && oldRoll < 1.0/4.0*PI){
+        } else if(roll > 3.0/2.0*PI && oldRoll < 1.0/2.0*PI){
             rollRate=1000.0*(roll-oldRoll)/float(deltaT);
         } else rollRate=1000.0*(roll-oldRoll-2.0*PI)/float(deltaT);
     }

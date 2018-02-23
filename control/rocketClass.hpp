@@ -44,7 +44,7 @@ private:
     float R[9]{0,0,0,
                0,0,0,
                0,0,0};     // rotation matrix, stored beause it's frequently used.
-    float up[3]{0,0,1};    // points "up" in the ground frame.    Placeholder is 0,0,1
+    float up[3]{0,0,1};    // points "up" in the ground frame.    Placeholder is 0,0,1.  Must be a unit vector
     float north[3]{1,0,0}; // points "north" in the ground plane. Placeholder is 1,0,0 or 0,1,0
 
     // Location Data and Trajectory
