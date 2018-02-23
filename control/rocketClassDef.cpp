@@ -33,14 +33,23 @@ float rocket::getSpeedSq(){
 }
 
 int rocket::updateSensorData(Adafruit_BNO055 &bno, Adafruit_BMP280 &baro){
-    imu::Quaternion quat = bno.getQuat();
-    q_x = quat.x();
-    q_y = quat.y();
-    q_z = quat.z();
-    q_w = quat.w();
-    z = baro.readAltitude(1013.25 /*HARDCODED, WE'LL CHANGE LATER*/);
-    pitchUp2Date = false;
-    rollUp2Date = false;
+    long current=millis()
+    if(current-lastUpdate>10){
+        deltaT=current-lastUpdate;
+        lastUpdate=current;
+
+        imu::Quaternion quat = bno.getQuat();
+        q_x = quat.x();
+        q_y = quat.y();
+        q_z = quat.z();
+        q_w = quat.w();
+        z = baro.readAltitude(1013.25 /*HARDCODED, WE'LL CHANGE LATER.  ADD TO CONFIG*/);
+
+        pitchUp2Date = false;
+        rollUp2Date = false;
+        rollMatrixUp2Date = false;
+        return 1;
+    }
     return 0;
 }
 
@@ -80,7 +89,11 @@ float rocket::getRoll(){
         if (rocketNorth[1]==0){
             roll = rocketNorth[0]>0 ? PI/2.0 : (3.0/2.0)*PI;
         } else roll= (rocketNorth[0]>0 ? 0 : PI) + atan(rocketNorth[0]/rocketNorth[1]);//TODO: make sure this accurately calculates roll for all angles
-        rollRate=1000.0*(roll-oldRoll)/float(deltaT);
+        if(oldRoll > 3.0/4.0*PI && roll < 1.0/4.0*PI){
+            rollRate=1000.0*(roll-oldRoll+2.0*PI)/float(deltaT);
+        } else if(roll > 3.0/4.0*PI && oldRoll < 1.0/4.0*PI){
+            rollRate=1000.0*(roll-oldRoll)/float(deltaT);
+        } else rollRate=1000.0*(roll-oldRoll-2.0*PI)/float(deltaT);
     }
     rollUp2Date = true;
     return roll;
