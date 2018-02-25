@@ -1,7 +1,7 @@
 #ifndef FLIGHT_PLAN
 #define FLIGHT_PLAN
 
-#include"utillity.hpp"
+#include"utility.hpp"
 
 enum direction
 {
@@ -51,11 +51,16 @@ public:
     /// Parse a flight plan string format:
     /// '#3;+0901000;-0001000;~1802000;\0'
     void parseFlightPlan(char*);
+    void beginRotation(unsigned long);
+    int getTargetAngle(unsigned long);
 
 private:
     bool valid;
     int numberOfFlightCommands;
     flightCommand* commands;
+
+    int currentMove;
+    unsigned long moveStartTime, moveEndTime;
 };
 
 #endif

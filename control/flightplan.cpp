@@ -1,4 +1,5 @@
 #include "flightplan.hpp"
+#include "utility.hpp"
 
 
 ///flightplan Implementation
@@ -13,6 +14,11 @@ flightCommand flightplan::operator[](int i) const
     }
     return flightCommand();
 }
+
+//void flightplan::hash()
+//{
+
+//}
 
 void flightplan::parseFlightPlan(char* plan)
 {
@@ -86,7 +92,7 @@ void flightplan::parseFlightPlan(char* plan)
         }
 
         // Parse time.
-        if (areDigits(&plan[pos],4))
+        if (areDigits(&plan[pos], 4))
         {
             commands[i].rollTime = getNumberFromChars(&plan[pos], 4);
             pos += 4;
@@ -107,4 +113,67 @@ void flightplan::parseFlightPlan(char* plan)
 
     // If it gets here, all formatting is correct.
     valid = true;
+}
+
+void flightplan::beginRotation(unsigned long time)
+{
+    // Move to the first command.
+    currentMove = 0;
+    // Save current time in millis.
+    moveStartTime = time;
+    // Calculate and save end of first move;
+    moveEndTime = time + commands[currentMove].rollTime;
+}
+
+int flightplan::getTargetAngle(unsigned long time)
+{
+    // If finished the last move, progress to next stage.
+    if (time > moveEndTime)
+    {
+        // Move to next step of flight plan.
+        currentMove++;
+        // Set the end time of the last move to the start time of this move.
+        moveStartTime = moveEndTime;
+        // Calculate and save end of next move.
+        moveEndTime = moveStartTime + commands[currentMove].rollTime;
+    }
+
+    if (currentMove < 0
+        || currentMove >= numberOfFlightCommands)
+    {
+        // return holding angle.
+        return commands[numberOfFlightCommands-1].heading;
+    }
+
+    // Calculate the target angle.
+    flightCommand& move = commands[currentMove];
+    flightCommand lastMove;
+    if (currentMove == 0)
+    {
+        lastMove.heading = 0;
+    }
+    else
+    {
+        lastMove = commands[currentMove - 1];
+    }
+
+    if (move.rotationDirection == shortest)
+    {
+        // If we don't care about the roll direction
+        // get there as quickly as possible.
+        return move.heading;
+    }
+
+    int relativeRotation = move.heading - lastMove.heading;
+    unsigned long turnTime = time - moveStartTime;
+    int progressAngle = relativeRotation * ((double) turnTime / (double) move.rollTime);
+    int targetAngle = lastMove.heading + progressAngle;
+
+    if (targetAngle < 0)
+    {
+        targetAngle += 360;
+    }
+    targetAngle %= 360;
+
+    return targetAngle;
 }
