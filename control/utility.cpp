@@ -18,9 +18,9 @@ float toFloat(unsigned char * c){
 
 void toChar(float in, unsigned char * c) {
     charFloatConverter converter;
-	converter.f = in;
+    converter.f = in;
 
-	c[0] = converter.b[0];
+    c[0] = converter.b[0];
     c[1] = converter.b[1];
     c[2] = converter.b[2];
     c[3] = converter.b[3];

@@ -9,33 +9,34 @@
 #define PI 2*asin(1)
 
 rocket::rocket(){
-	  // Orientation Data
-	  pitch = 0;
-	  roll = 0;
-	  rollRate = 0;
-	  // Location Data and Trajectory
-	  // All values should be in ground frame.
-	  z = 0;   // Altitude
-	  zV = 0;  // Change in Altitude
-	  rollUp2Date = false;
-	  pitchUp2Date = false;
-      rollMatrixUp2Date = false;
-      speedUp2Date = false;
-	  Adafruit_BMP280 bmp;
-	  Adafruit_BNO055 orient = Adafruit_BNO055(55);
+    // Orientation Data
+    pitch = 0;
+    roll = 0;
+    rollRate = 0;
+    // Location Data and Trajectory
+    // All values should be in ground frame.
+    z = 0;   // Altitude
+    zV = 0;  // Change in Altitude
+    rollUp2Date = false;
+    pitchUp2Date = false;
+    rollMatrixUp2Date = false;
+    speedUp2Date = false;
+    Adafruit_BMP280 bmp;
+    Adafruit_BNO055 orient = Adafruit_BNO055(55);
+    calibrationPressure = 0;
     omega = 0;
     moi = 0;
 }
 
 float rocket::getSpeed(){
-	if(!speedUp2Date){
+    if(!speedUp2Date){
         zV=(1000.0*(z-oldZ)/float(deltaT))/cos(getPitch());
         speedUp2Date=true
     }
     return zV;
 }
 float rocket::getSpeedSq(){
-	return SQ(getSpeed());
+    return SQ(getSpeed());
 }
 
 int rocket::updateSensorData(Adafruit_BNO055 &bno, Adafruit_BMP280 &baro){
@@ -50,7 +51,7 @@ int rocket::updateSensorData(Adafruit_BNO055 &bno, Adafruit_BMP280 &baro){
         q_z = quat.z();
         q_w = quat.w();
         oldZ=z;
-        z = baro.readAltitude(1013.25 /*HARDCODED, WE'LL CHANGE LATER.  ADD TO CONFIG*/);
+        z = baro.readAltitude(calibrationPressure /*HARDCODED, WE'LL CHANGE LATER.  ADD TO CONFIG*/);
 
         pitchUp2Date = false;
         rollUp2Date = false;
@@ -113,10 +114,10 @@ int rocket::updateRotMatrix(){
         float s = (q == 0) ? 1 : (1.0 / q);
     
         R[0] = 1 - 2 * s*(SQ(q_y) + SQ(q_z)); R[1] = 2 * s*(q_x*q_y - q_z*q_w); R[2] = 2 * s*(q_x*q_z+q_y*q_w);
-	    R[3] = 2 * s*(q_x*q_y+q_z*q_w); R[4] = 1 - 2 * s*(Q[0] * Q[0] + Q[2] * Q[2]); R[5] = 2 * s*(q_y*q_z-q_x*q_w);
-	    R[6] = 2 * s*(q_x*q_z + q_y * q_w); R[7] = 2 * s*(q_y*q_z + q_x * q_w); R[8] = 1 - 2 * s*(SQ(q_x) + SQ(q_y));
-      
-    }    
+        R[3] = 2 * s*(q_x*q_y+q_z*q_w); R[4] = 1 - 2 * s*(Q[0] * Q[0] + Q[2] * Q[2]); R[5] = 2 * s*(q_y*q_z-q_x*q_w);
+        R[6] = 2 * s*(q_x*q_z + q_y * q_w); R[7] = 2 * s*(q_y*q_z + q_x * q_w); R[8] = 1 - 2 * s*(SQ(q_x) + SQ(q_y));
+
+    }
 
     rollMatrixUp2Date=true;
     return 0;
@@ -124,7 +125,7 @@ int rocket::updateRotMatrix(){
 
 float rocket::getRollRate(){
     getRoll();
-	return rollRate;
+    return rollRate;
 }
 
 int rocket::fillModel(int fpsize, int devName){
@@ -140,11 +141,12 @@ int rocket::fillModel(int fpsize, int devName){
         switch (property){
             case 0: omega = catof(str); break;
             case 1: moi = catof(str); break;
-            case 2: plan.parseFlightPlan(str); break;
+            case 2: calibrationPressure = catof(str); break;
+            case 3: plan.parseFlightPlan(str); break;
         }
         {
-          delete[] str;
-          str = nullptr;
+            delete[] str;
+            str = nullptr;
         }
         ++property;
     }

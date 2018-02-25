@@ -8,7 +8,7 @@
 
 #ifndef _ROCKET_HPP_
 #define _ROCKET_HPP_
-#define numOfCParams 3
+#define numOfCParams 4
 #define commsDevice 19
 #define fpacc 5
 #define numBytes 64
@@ -60,6 +60,7 @@ private:
     bool speedUp2Date;
 
     float omega;
+    float calibrationPressure;
     float moi;
     flightplan plan;
 };
