@@ -56,7 +56,7 @@ void loop() {
     Serial.println(F("IN LOOP"));
     //any code that needs to run every loop regardless of flightMode.
     if (hprcRock.updateSensorData(orient, bmp) == 0){
-
+        hprcRock.sendDataComms();
     }
     //Send Sensor Data for logging
 //    hprcRock.logData();

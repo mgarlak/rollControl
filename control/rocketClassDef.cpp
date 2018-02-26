@@ -153,6 +153,17 @@ int rocket::fillModel(int fpsize, int devName){
     return 0;
 }
 
-int rocket::logData(char* fname, int floatSize){
-    
+int rocket::sendDataComms(int device){
+    char msg* = new char[22];
+    char i = 0;
+    for (; i < 4; ++i){
+        toChar(Q[i], msg[i*4]);
+    }
+    toChar(z, msg[i*4]);
+    msg[++i] = '1';
+    msg[++i] = '\0';
+    Serial.println("SEND DATA");
+    Wire.beginTransmission(device);
+    Wire.write(msg);
+    Wire.endTransmission();
 }

@@ -19,7 +19,7 @@ public:
     ~rocket(){};
     int fillModel(int, int);
     int updateSensorData(Adafruit_BNO055&, Adafruit_BMP280&);
-    int logData(char*, int);
+    int sendDataComms(int);
     int updateRotMatrix();
     float getSpeed();
     float getSpeedSq();
@@ -28,6 +28,7 @@ public:
     float getPitch();
     float getz() {return z;};
     float* getQ() {return Q;};
+
 private:
     // Orientation Data
     float Q[4] {0,0,0,0};
