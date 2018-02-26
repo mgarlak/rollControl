@@ -31,13 +31,16 @@ void loop(){
         while (Serial.available()){
             fp2 = caAppend(fp2, Serial.read());
         }
-        Serial.write(fp2);
-        delete[] fp2;
-        newConfig = false;
+        if (fp2 != nullptr){
+            Serial.write(fp2);
+            delete[] fp2;
+            newConfig = false;
+        }
     }
 }
 
 void requestHandler(){
+    Serial.println("IN REQUEST");
     switch (cmdSqnc){
         case 0: ackSD(); break;
         case 1: sendParam(); break;
@@ -46,6 +49,7 @@ void requestHandler(){
 }
 
 void receiveHandler(int bytesReceived){
+    Serial.println("IN RECEIVE");
     for (int i = 0; Wire.available() && i < 22; ++i){
         data[i] = Wire.read();
     }
