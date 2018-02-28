@@ -14,7 +14,7 @@ File logger;
 int cmdSqnc = 0;
 char data[22];
 char* fp2 = nullptr;
-bool newConfig = true;
+bool keepListening = true;
 
 void setup(){
     SD.begin(sdPin);
@@ -27,15 +27,27 @@ void setup(){
 }
 
 void loop(){
-    if (newConfig){
-        while (Serial.available()){
-            fp2 = caAppend(fp2, Serial.read());
+    while (keepListening){
+        char inc = Serial.read();
+        delay(1);
+        if (inc == '\0'){ // entire FP received
+            // send char* to control device
+            Wire.requestFrom(controlDevice, 1);
+            if (Wire.read() == '1'){
+                // SEND ACK TO GC
+                Serial.print
+                keepListening = false;
+                break;
+            }
+            else {
+                // SEND ERROR TO GC
+                delete fp2[];
+                fp2 = nullptr;
+                continue;
+            }
         }
-        if (fp2 != nullptr){
-            Serial.write(fp2);
-            delete[] fp2;
-            newConfig = false;
-        }
+        else if (inc == -1) continue;
+        else fp2 = caAppend(fp2, inc);
     }
 }
 
@@ -53,9 +65,9 @@ void receiveHandler(int bytesReceived){
     for (int i = 0; Wire.available() && i < 22; ++i){
         data[i] = Wire.read();
     }
-    Serial.println(str);
-    logSD(str);
-    transmitXbee(str);
+    Serial.println(data);
+    logSD(data);
+    transmitXbee(data);
 }
 
 void ackSD(){
@@ -100,9 +112,15 @@ void sendAck(){
 
 void logSD(char* str){
     if (!logger){ logger = SD.open(flightLog); }
-    logger.println(str, HEX);
+    int i = 0;
+    while (str[i] != '\0'){
+        logger.print(str[i], HEX);
+    }
 }
 
 void transmitXbee(char* str){
-    Xbee.print(str, HEX);
+    int i = 0;
+    while (str[i] != '\0'){
+        Serial.print(str[i], HEX);
+    }
 }
