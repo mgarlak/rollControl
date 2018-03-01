@@ -33,7 +33,7 @@ void loop(){
         if (inc == '\0'){ // entire FP received
             // send char* to control device
             Wire.requestFrom(controlDevice, 1);
-            if (Wire.read() == '1'){
+            if (Wire.read() == '0'){
                 // SEND ACK TO GC
                 Serial.print
                 keepListening = false;
