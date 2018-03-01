@@ -8,11 +8,14 @@ rocket hprcRock;
 Adafruit_BMP280 bmp;
 Adafruit_BNO055 orient = Adafruit_BNO055(55);
 Servo ailerons;
-bool wireFlag = false;
+bool nfpValid;
+
 
 
 void setup() {
-    //serialDump();
+    serialDump();
+    Wire.onRequest(requestHandler);
+    Wire.onReceive(receiveHandler);
     pinMode(commsRst, OUTPUT);
     pinMode(commsRst, HIGH);
     ailerons.attach(servoPin);
@@ -82,6 +85,21 @@ void loop() {
     }
 }
 
+void receiveHandler(int bytesReceived){
+    switch(flightMode){
+        case 0: newFlightPlan();
+    }
+}
+
+void requestHandler(){
+    switch(flightMode){
+        case 0: {
+            if (nfpValid) sendAck();
+            else sendErr();
+        }
+    }
+}
+
 void serialDump(){
     while (Serial.available()){
         char d = Serial.read();
@@ -93,3 +111,21 @@ void resetDev(int pin){
     delay(25);
     digitalWrite(pin, HIGH);
 }
+
+void newFlightPlan(){
+    Serial.println(F("GOT NEW FP!"));
+    char* potfp = nullptr;
+    flightPlan nfp;
+    for (int i = 0; Wire.available(); ++i){
+        nfp = caAppend(nfp, Wire.read());
+    }
+    nfp.parseFlightPlan(potfp);
+    if (nfp.validFlightPlan()){
+        hprcRock.getPlan() = nfp;
+        nfpValid = true;
+    }
+    else nfpValid = false;
+}
+
+void sendAck(){ Wire.write('0'); }
+void sendErr(){ Wire.write('1'); }
