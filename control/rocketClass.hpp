@@ -1,13 +1,15 @@
-#include <MatrixMath.h>
+#ifndef _ROCKET_HPP_
+#define _ROCKET_HPP_
+
 #include <math.h>
-#include "flightplan.hpp"
 #include <Wire.h>
 #include <Adafruit_BNO055.h>
 #include <Adafruit_BMP280.h>
 #include <Adafruit_Sensor.h>
+#include <MatrixMath.h>
+#include "flightplan.hpp"
+#include "utility.hpp"
 
-#ifndef _ROCKET_HPP_
-#define _ROCKET_HPP_
 #define numOfCParams 3
 #define commsDevice 19
 #define fpacc 5

@@ -1,7 +1,7 @@
 #ifndef UTILLITY_CPP
 #define UTILLITY_CPP
 
-#include"utillity.hpp"
+#include"utility.hpp"
 
 float toFloat(unsigned char * c){
 
