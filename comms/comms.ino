@@ -15,6 +15,12 @@ File logger;
 int cmdSqnc = 0;
 bool wireFlag = false;
 
+void serialEvent() {
+  if (Serial.available()) {
+    Serial.write(Serial.read());
+  }
+}
+
 void setup(){
   	SD.begin(sdPin);
 	Xbee.begin(9600);

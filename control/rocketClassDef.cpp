@@ -9,30 +9,50 @@
 
 
 rocket::rocket(){
-	  // Orientation Data
-	  pitch = 0;
-	  roll = 0;
-	  rollRate = 0;
-	  // Location Data and Trajectory
-	  // All values should be in ground frame.
-	  z = 0;   // Altitude
-	  zV = 0;  // Change in Altitude
-	  rollUp2Date = false;
-	  pitchUp2Date = false;
-      rollMatrixUp2Date = false;
-      speedUp2Date = false;
-	  Adafruit_BMP280 bmp;
-	  Adafruit_BNO055 orient = Adafruit_BNO055(55);
+    // Orientation Data
+    pitch = 0;
+    roll = 0;
+    rollRate = 0;
+    // Location Data and Trajectory
+    // All values should be in ground frame.
+    z = 0;   // Altitude
+    zV = 0;  // Change in Altitude
+    rollUp2Date = false;
+    pitchUp2Date = false;
+    rollMatrixUp2Date = false;
+    speedUp2Date = false;
+    Adafruit_BMP280 bmp;
+    Adafruit_BNO055 orient = Adafruit_BNO055(55);
+
+    /*
+    Get the gravity vector;
+    normalize it;
+    multiply it by -1
+    set up to that.
+    
+    get the magnetic field vector.
+    take the projection of the magnetic field vector on the up vector
+    subtract that projection from the magnetic vector
+    that's your north vector (or maybe the north vector multiplied by -1)
+    */
+
+
     omega = 0;
     moi = 0;
 }
 
 float rocket::getSpeed(){
 	if(!speedUp2Date){
-        zV=(1000.0*(z-oldZ)/float(deltaT))/cos(getPitch());
-        speedUp2Date=true
+        float inverseR[9];
+        Matrix.Copy((float *)R,3,3,(float *)inverseR);
+        Matrix.Invert((float *)inverseR);
+        /*
+        rotate the acceleration vector by the inverse of the rotation matrix
+        add the acceleration vector to the velocity vector.
+
+        */
     }
-    return zV;
+    return /*the square root of the dot product of rocketUp and the velocity vector*/;
 }
 float rocket::getSpeedSq(){
 	return SQ(getSpeed());
