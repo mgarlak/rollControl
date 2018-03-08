@@ -6,7 +6,6 @@
 #define q_z Q[2]
 #define q_w Q[3]
 #define SQ(x) x*x
-#define PI 2*asin(1)
 
 rocket::rocket(){
     // Orientation Data
@@ -21,8 +20,6 @@ rocket::rocket(){
     pitchUp2Date = false;
     rollMatrixUp2Date = false;
     speedUp2Date = false;
-    Adafruit_BMP280 bmp;
-    Adafruit_BNO055 orient = Adafruit_BNO055(55);
     calibrationPressure = 0;
     omega = 0;
     moi = 0;
@@ -31,7 +28,7 @@ rocket::rocket(){
 float rocket::getSpeed(){
     if(!speedUp2Date){
         zV=(1000.0*(z-oldZ)/float(deltaT))/cos(getPitch());
-        speedUp2Date=true
+        speedUp2Date=true;
     }
     return zV;
 }
@@ -40,7 +37,7 @@ float rocket::getSpeedSq(){
 }
 
 int rocket::updateSensorData(Adafruit_BNO055 &bno, Adafruit_BMP280 &baro){
-    long current=millis()
+    long current=millis();
     if(current-lastUpdate>10){
         deltaT=current-lastUpdate;
         lastUpdate=current;
@@ -154,16 +151,20 @@ int rocket::fillModel(int fpsize, int devName){
 }
 
 int rocket::sendDataComms(int device){
-    char msg* = new char[22];
-    char i = 0;
+    unsigned char* msg = new unsigned char[22];
+    unsigned char i = 0;
     for (; i < 4; ++i){
-        toChar(Q[i], msg[i*4]);
+        toChar(Q[i], msg+(i*4));
     }
-    toChar(z, msg[i*4]);
+    toChar(z, msg+(i*4));
     msg[++i] = '1';
     msg[++i] = '\0';
     Serial.println("SEND DATA");
+    int j = 0;
     Wire.beginTransmission(device);
-    Wire.write(msg);
+    while (j < 22){
+        Wire.write(msg[j]);
+        ++j;
+    }
     Wire.endTransmission();
 }

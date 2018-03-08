@@ -28,6 +28,7 @@ public:
     float getPitch();
     float getz() {return z;};
     float* getQ() {return Q;};
+    flightplan getPlan(){return plan;};
 
 private:
     // Orientation Data

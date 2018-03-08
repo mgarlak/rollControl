@@ -17,6 +17,7 @@ char* fp2 = nullptr;
 bool keepListening = true;
 
 void setup(){
+    serialDump();
     SD.begin(sdPin);
     Serial.begin(57600);
     Wire.begin(19);
@@ -31,17 +32,20 @@ void loop(){
         char inc = Serial.read();
         delay(1);
         if (inc == '\0'){ // entire FP received
-            // send char* to control device
+            int i = 0;
+            while(fp2[i] != '\0'){
+                Wire.write(fp2[i]);
+                ++i;
+            }
             Wire.requestFrom(controlDevice, 1);
             if (Wire.read() == '0'){
-                // SEND ACK TO GC
-                Serial.print
+                Serial.println(F("VALID FLIGHT PLAN"));
                 keepListening = false;
                 break;
             }
             else {
-                // SEND ERROR TO GC
-                delete fp2[];
+                Serial.println(F("INVALID FLIGHT PLAN. TRY AGAIN"));
+                delete[] fp2;
                 fp2 = nullptr;
                 continue;
             }
@@ -61,7 +65,7 @@ void requestHandler(){
 }
 
 void receiveHandler(int bytesReceived){
-    Serial.println("IN RECEIVE");
+    Serial.println(F("IN RECEIVE"));
     for (int i = 0; Wire.available() && i < 22; ++i){
         data[i] = Wire.read();
     }
@@ -122,5 +126,11 @@ void transmitXbee(char* str){
     int i = 0;
     while (str[i] != '\0'){
         Serial.print(str[i], HEX);
+    }
+}
+
+void serialDump(){
+    while (Serial.available()){
+        char d = Serial.read();
     }
 }

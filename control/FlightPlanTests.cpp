@@ -1,4 +1,4 @@
-#define TESTING true
+/*#define TESTING true
 #if TESTING
 
 #include <cassert>
@@ -236,4 +236,4 @@ int main()
     return 0;
 }
 
-#endif
+#endif*/

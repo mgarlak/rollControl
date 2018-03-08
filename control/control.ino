@@ -10,8 +10,6 @@ Adafruit_BNO055 orient = Adafruit_BNO055(55);
 Servo ailerons;
 bool nfpValid;
 
-
-
 void setup() {
     serialDump();
     Wire.onRequest(requestHandler);
@@ -19,7 +17,7 @@ void setup() {
     pinMode(commsRst, OUTPUT);
     pinMode(commsRst, HIGH);
     ailerons.attach(servoPin);
-    Serial.begin(9600);
+    Serial.begin(57600);
     Wire.begin(75);
 
     Serial.print(F("Initializing SD Card..."));
@@ -59,13 +57,12 @@ void loop() {
     Serial.println(F("IN LOOP"));
     //any code that needs to run every loop regardless of flightMode.
     if (hprcRock.updateSensorData(orient, bmp) == 0){
-        hprcRock.sendDataComms();
+        //hprcRock.sendDataComms();
     }
     //Send Sensor Data for logging
 //    hprcRock.logData();
     switch (flightMode){
         case 0 : 
-            //On the ground
             break;
         case 1:
             //boost phase
@@ -113,12 +110,12 @@ void resetDev(int pin){
 }
 
 void newFlightPlan(){
-    Serial.println(F("GOT NEW FP!"));
     char* potfp = nullptr;
-    flightPlan nfp;
     for (int i = 0; Wire.available(); ++i){
-        nfp = caAppend(nfp, Wire.read());
+        potfp = caAppend(potfp, Wire.read());
     }
+    Serial.println(F("GOT NEW FP!"));
+    flightplan nfp;
     nfp.parseFlightPlan(potfp);
     if (nfp.validFlightPlan()){
         hprcRock.getPlan() = nfp;
