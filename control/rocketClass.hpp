@@ -34,11 +34,11 @@ public:
     float getz() {return z;};
     float* getQ() {return (float*)Q;};
 
-    float getDampingConstant();
-    float getSpringConstant();
+    float getDampingConstant() { return 1.0; }
+    float getSpringConstant() { return 1.0; }
 
-    float getInherientTorque(); //TODO: impliment
-    int finAngle(float);
+    float getInherientTorque() { return 0.0; } //TODO: impliment
+    int finAngle(float f) { return static_cast<int>(f); }
 
     const flightplan& getPlan(){ return plan;}
 private:
