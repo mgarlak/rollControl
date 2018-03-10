@@ -1,7 +1,7 @@
 #ifndef FLIGHT_PLAN
 #define FLIGHT_PLAN
 
-#include"utility.hpp"
+#include "utility.hpp"
 
 enum direction
 {

@@ -4,16 +4,24 @@
 #include <SPI.h>
 #include <SD.h>
 #include <Wire.h>
+
 #define configFile "ROCKETCF.TXT"
 #define flightLog "flogger1.txt"
 #define sdPin 10
 #define fpacc 5
 #define controlDevice 75
+
 SoftwareSerial Xbee(2,3); //Rx, Tx
 File configf;
 File logger;
 int cmdSqnc = 0;
 bool wireFlag = false;
+
+void serialEvent() {
+  if (Serial.available()) {
+    Serial.write(Serial.read());
+  }
+}
 
 void setup(){
   	SD.begin(sdPin);

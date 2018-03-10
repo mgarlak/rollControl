@@ -1,17 +1,21 @@
-#include <MatrixMath.h>
+#ifndef _ROCKET_HPP_
+#define _ROCKET_HPP_
+
 #include <math.h>
-#include "flightplan.hpp"
 #include <Wire.h>
 #include <Adafruit_BNO055.h>
 #include <Adafruit_BMP280.h>
 #include <Adafruit_Sensor.h>
+#include <MatrixMath.h>
+#include "flightplan.hpp"
+#include "utility.hpp"
 
-#ifndef _ROCKET_HPP_
-#define _ROCKET_HPP_
 #define numOfCParams 3
 #define commsDevice 19
 #define fpacc 5
 #define numBytes 64
+
+#define PI 2*asin(1)
 
 class rocket {
 public:
@@ -21,13 +25,22 @@ public:
     int updateSensorData(Adafruit_BNO055&, Adafruit_BMP280&);
     int logData(char*, int);
     int updateRotMatrix();
+
     float getSpeed();
     float getSpeedSq();
     float getRoll();
     float getRollRate();
     float getPitch();
     float getz() {return z;};
-    float* getQ() {return Q;};
+    float* getQ() {return (float*)Q;};
+
+    float getDampingConstant();
+    float getSpringConstant();
+
+    float getInherientTorque(); //TODO: impliment
+    int finAngle(float);
+
+    const flightplan& getPlan(){ return plan;}
 private:
     // Orientation Data
     float Q[4] {0,0,0,0};
@@ -44,7 +57,7 @@ private:
     float R[9]{0,0,0,
                0,0,0,
                0,0,0};     // rotation matrix, stored beause it's frequently used.
-    float up[3]{0,0,1};    // points "up" in the ground frame.    Placeholder is 0,0,1
+    float up[3]{0,0,1};    // points "up" in the ground frame.    Placeholder is 0,0,1.  Must be a unit vector
     float north[3]{1,0,0}; // points "north" in the ground plane. Placeholder is 1,0,0 or 0,1,0
 
     // Location Data and Trajectory

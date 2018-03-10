@@ -22,6 +22,12 @@ int getCaSize(char*);
 char* caAppend(char*, char);
 int pftoi(float&);
 
+
+//vector math calculations
+void cross(float*,float*,float*);
+float vecMag(float *,char);
+void normalize(float*,float*);
+float dotProd(float*,float*);
 //RocketClass utility
 
 float catof(char*);
