@@ -1,9 +1,8 @@
 #ifndef UTILLITY_CPP
 #define UTILLITY_CPP
 
-#include"math.h"
-
-#include"utility.hpp"
+#include "utility.hpp"
+#include "math.h"
 
 float toFloat(unsigned char * c){
 
