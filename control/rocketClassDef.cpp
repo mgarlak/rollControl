@@ -49,7 +49,7 @@ int rocket::updateSensorData(Adafruit_BNO055 &bno, Adafruit_BMP280 &baro){
         q_z = quat.z();
         q_w = quat.w();
         oldZ=z;
-        z = baro.readAltitude(calibrationPressure /*HARDCODED, WE'LL CHANGE LATER.  ADD TO CONFIG*/);
+        z = baro.readAltitude(calibrationPressure);
 
         pitchUp2Date = false;
         rollUp2Date = false;
@@ -110,7 +110,7 @@ int rocket::updateRotMatrix(){
     if(!rollMatrixUp2Date){
         float q =  (SQ(q_x) + SQ(q_y) + SQ(q_z) + SQ(q_w));//Magnatude of the quaternion squared;
         float s = (q == 0) ? 1 : (1.0 / q);
-    
+
         R[0] = 1 - 2 * s*(SQ(q_y) + SQ(q_z)); R[1] = 2 * s*(q_x*q_y - q_z*q_w); R[2] = 2 * s*(q_x*q_z+q_y*q_w);
         R[3] = 2 * s*(q_x*q_y+q_z*q_w); R[4] = 1 - 2 * s*(Q[0] * Q[0] + Q[2] * Q[2]); R[5] = 2 * s*(q_y*q_z-q_x*q_w);
         R[6] = 2 * s*(q_x*q_z + q_y * q_w); R[7] = 2 * s*(q_y*q_z + q_x * q_w); R[8] = 1 - 2 * s*(SQ(q_x) + SQ(q_y));
@@ -160,15 +160,14 @@ int rocket::sendDataComms(int device){
     toChar(z, msg+(i*4));
     msg[++i] = '1';
 
-    Serial.println("SENDING");
-    int j = 0;
+    //Serial.println("SENDING");
     Wire.beginTransmission(device);
-    j = 0;
     char* out = new char[(packetSize*2) + 1];
     toHex(msg, out, packetSize);
+    char j = 0;
     while (j < packetSize){
-        Serial.print(out[j*2]);
-        Serial.print(out[(j*2)+1]);
+        //Serial.print(out[j*2]);
+        //Serial.print(out[(j*2)+1]);
         Wire.write(msg[j]);
         ++j;
     }

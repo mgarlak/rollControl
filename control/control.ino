@@ -21,9 +21,6 @@ void setup() {
     Wire.begin(75);
 
     Serial.print(F("Initializing SD Card..."));
-    //Wire.requestFrom(commsDevice, 1);
-    //Serial.print(F("Foo"));
-    
     resetDev(commsRst);
     delay(1500);
     Wire.requestFrom(commsDevice,1);
@@ -57,12 +54,12 @@ void loop() {
     Serial.println(F("IN LOOP"));
     //any code that needs to run every loop regardless of flightMode.
     if (hprcRock.updateSensorData(orient, bmp) == 0){
-          
+
     }
-    hprcRock.sendDataComms(commsDevice); 
+    hprcRock.sendDataComms(commsDevice);
     //Send Sensor Data for logging
     switch (flightMode){
-        case 0 : 
+        case 0 :
             break;
         case 1:
             //boost phase
@@ -80,7 +77,7 @@ void loop() {
             //on ground
             break;
     }
-    delay(1000);
+    delay(100);
 }
 
 void receiveHandler(int bytesReceived){
