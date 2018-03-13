@@ -6,6 +6,7 @@
 #define q_z Q[2]
 #define q_w Q[3]
 #define SQ(x) x*x
+#define packetSize 22
 
 rocket::rocket(){
     // Orientation Data
@@ -151,20 +152,30 @@ int rocket::fillModel(int fpsize, int devName){
 }
 
 int rocket::sendDataComms(int device){
-    unsigned char* msg = new unsigned char[22];
+    unsigned char* msg = new unsigned char[packetSize];
     unsigned char i = 0;
     for (; i < 4; ++i){
         toChar(Q[i], msg+(i*4));
     }
     toChar(z, msg+(i*4));
     msg[++i] = '1';
-    msg[++i] = '\0';
+
     Serial.println("SEND DATA");
     int j = 0;
     Wire.beginTransmission(device);
-    while (j < 22){
+    j = 0;
+    char* out = new char[(packetSize*2) + 1];
+    toHex(msg, out, packetSize);
+    while (j < packetSize){
+        Serial.print(out[j*2]);
+        Serial.print(out[(j*2)+1]);
         Wire.write(msg[j]);
         ++j;
     }
+
     Wire.endTransmission();
+    delete[] out;
+    out = nullptr;
+    delete[] msg;
+    msg = nullptr;
 }

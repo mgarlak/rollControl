@@ -1,8 +1,10 @@
 #ifndef UTILLITY_CPP
 #define UTILLITY_CPP
-
 #include"utility.hpp"
-#include"math.h"
+
+
+char wub[16] = {'0','1','2','3','4','5','6','7','8','9',
+                'A','B','C','D','E','F'};
 
 float toFloat(unsigned char * c){
 
@@ -168,6 +170,15 @@ void normalize(float* a,float*b){
     b[0]=a[0]/vecAMag;
     b[1]=a[1]/vecAMag;
     b[2]=a[2]/vecAMag;
+}
+
+void toHex(unsigned char* in, char* out, char len){
+    char i = 0;
+    for (; i < len; ++i){
+        out[2*i] = wub[(in[i]/16)];
+        out[(2*i)+1] = wub[(in[i]%16)];
+    }
+    out[2*i] = '\0';
 }
 
 #endif

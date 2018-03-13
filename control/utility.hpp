@@ -1,6 +1,8 @@
 #ifndef UTILLITY_HPP
 #define UTILLITY_HPP
 
+#include"math.h"
+
 union charFloatConverter{
     unsigned char b[4];
     float f;
@@ -21,6 +23,8 @@ bool isFpVital(char);
 int getCaSize(char*);
 char* caAppend(char*, char);
 int pftoi(float&);
+
+void toHex(unsigned char*, char*, char);
 
 //RocketClass utility
 

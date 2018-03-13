@@ -8,13 +8,14 @@
 #define sdPin 10
 #define fpacc 5
 #define controlDevice 75
+#define packetSize 22
 
 File configf;
 File logger;
 int cmdSqnc = 0;
-char data[22];
+unsigned char* data = new unsigned char[packetSize];
 char* fp2 = nullptr;
-bool keepListening = true;
+bool keepListening = false;
 
 void setup(){
     serialDump();
@@ -28,6 +29,7 @@ void setup(){
 }
 
 void loop(){
+    Serial.println("LOOPING");
     while (keepListening){
         char inc = Serial.read();
         delay(1);
@@ -53,10 +55,11 @@ void loop(){
         else if (inc == -1) continue;
         else fp2 = caAppend(fp2, inc);
     }
+    delay(1000);
 }
 
 void requestHandler(){
-    Serial.println("IN REQUEST");
+    Serial.println(F("IN REQUEST"));
     switch (cmdSqnc){
         case 0: ackSD(); break;
         case 1: sendParam(); break;
@@ -65,13 +68,43 @@ void requestHandler(){
 }
 
 void receiveHandler(int bytesReceived){
+    //int i = 0;
     Serial.println(F("IN RECEIVE"));
-    for (int i = 0; Wire.available() && i < 22; ++i){
-        data[i] = Wire.read();
+    char i = 0;
+    while(Wire.available()){
+        data[i] = Wire.read();      
+        ++i;
     }
-    Serial.println(data);
+    i = 0;
+    while (i < packetSize){
+        Serial.print(data[i]);
+        ++i;
+    }
+    Serial.println("");
+    char* out = new char[(packetSize*2)+1];
+    toHex(data, out, packetSize);
+    char j = 0;
+    while (j < packetSize){
+        Serial.print(out[j*2]);
+        Serial.print(out[j*2]+1);
+        ++j;
+    }
+    Serial.println("");
+    delete[] out;
+    out = nullptr;
+    /*for (int i = 0; Wire.available() && i < packetSize; ++i){
+        data[i] = Wire.read();
+        if (i%2 == 0){
+            Serial.print("BAD");
+        }
+        else Serial.print("BAD");
+        ++i;
+    }
+    for (int i = 0; i < packetSize; ++i){
+      Serial.print(data[i]);
+    }
     logSD(data);
-    transmitXbee(data);
+    transmitXbee(data);*/
 }
 
 void ackSD(){
@@ -117,15 +150,17 @@ void sendAck(){
 void logSD(char* str){
     if (!logger){ logger = SD.open(flightLog); }
     int i = 0;
-    while (str[i] != '\0'){
+    while (i < packetSize){
         logger.print(str[i], HEX);
     }
+    logger.close();
 }
 
 void transmitXbee(char* str){
     int i = 0;
-    while (str[i] != '\0'){
+    while (i < packetSize){
         Serial.print(str[i], HEX);
+        ++i;
     }
 }
 
