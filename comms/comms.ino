@@ -4,7 +4,7 @@
 #include <Wire.h>
 
 #define configFile "ROCKETCF.TXT"
-#define flightLog "flogger1.txt"
+#define flightLog "FLOGGER1.TXT"
 #define sdPin 10
 #define fpacc 5
 #define controlDevice 75
@@ -68,11 +68,11 @@ void requestHandler(){
 }
 
 void receiveHandler(int bytesReceived){
-    //int i = 0;
     Serial.println(F("IN RECEIVE"));
     char i = 0;
+    Serial.print("Received: ");
     while(Wire.available()){
-        data[i] = Wire.read();      
+        data[i] = Wire.read();
         ++i;
     }
     i = 0;
@@ -83,13 +83,15 @@ void receiveHandler(int bytesReceived){
     Serial.println("");
     char* out = new char[(packetSize*2)+1];
     toHex(data, out, packetSize);
-    char j = 0;
-    while (j < packetSize){
-        Serial.print(out[j*2]);
-        Serial.print(out[j*2]+1);
-        ++j;
+    Serial.print("HEX: ");
+    i = 0;
+    while (i < packetSize){
+        Serial.print(out[i*2]);
+        Serial.print(out[(i*2)+1]);
+        ++i;
     }
     Serial.println("");
+    logSD(data);
     delete[] out;
     out = nullptr;
     /*for (int i = 0; Wire.available() && i < packetSize; ++i){
@@ -111,7 +113,7 @@ void ackSD(){
     Serial.print(F("Initilizing SD card..."));
     configf = SD.open(configFile);
     if (configf){
-        sendAck(); 
+        sendAck();
         Serial.println(F("SD Card Init Success!"));
         ++cmdSqnc;
     }
@@ -126,7 +128,7 @@ void sendParam(){
             char ch = configf.read();
             if (ch == -1) {
                 Serial.println(F("Done Parsing"));
-                ++cmdSqnc; 
+                ++cmdSqnc;
                 break;
             }
             else if (ch == '\n'){
@@ -147,16 +149,18 @@ void sendAck(){
     Wire.write('1');
 }
 
-void logSD(char* str){
-    if (!logger){ logger = SD.open(flightLog); }
-    int i = 0;
+void logSD(unsigned char* str){
+    /*if (!logger){ */logger = SD.open(flightLog, FILE_WRITE);// }
+    Serial.println(F("--------LOGGING SD!--------"));
+    char i = 0;
     while (i < packetSize){
-        logger.print(str[i], HEX);
+        logger.write(str[i]);
+        ++i;
     }
     logger.close();
 }
 
-void transmitXbee(char* str){
+void transmitXbee(unsigned char* str){
     int i = 0;
     while (i < packetSize){
         Serial.print(str[i], HEX);

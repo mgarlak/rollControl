@@ -160,7 +160,7 @@ int rocket::sendDataComms(int device){
     toChar(z, msg+(i*4));
     msg[++i] = '1';
 
-    Serial.println("SEND DATA");
+    Serial.println("SENDING");
     int j = 0;
     Wire.beginTransmission(device);
     j = 0;
