@@ -55,11 +55,10 @@ void loop(){
         else if (inc == -1) continue;
         else fp2 = caAppend(fp2, inc);
     }
-    delay(1000);
+    delay(100);
 }
 
 void requestHandler(){
-    Serial.println(F("IN REQUEST"));
     switch (cmdSqnc){
         case 0: ackSD(); break;
         case 1: sendParam(); break;
@@ -68,45 +67,19 @@ void requestHandler(){
 }
 
 void receiveHandler(int bytesReceived){
-    Serial.println(F("IN RECEIVE"));
     char i = 0;
     Serial.print("Received: ");
     while(Wire.available()){
         data[i] = Wire.read();
+        //Serial.print(data[i]);
         ++i;
     }
-    i = 0;
-    while (i < packetSize){
-        Serial.print(data[i]);
-        ++i;
-    }
-    Serial.println("");
     char* out = new char[(packetSize*2)+1];
     toHex(data, out, packetSize);
-    Serial.print("HEX: ");
-    i = 0;
-    while (i < packetSize){
-        Serial.print(out[i*2]);
-        Serial.print(out[(i*2)+1]);
-        ++i;
-    }
-    Serial.println("");
-    logSD(data);
+    logSD(out);
+    transmitXbee(out);
     delete[] out;
     out = nullptr;
-    /*for (int i = 0; Wire.available() && i < packetSize; ++i){
-        data[i] = Wire.read();
-        if (i%2 == 0){
-            Serial.print("BAD");
-        }
-        else Serial.print("BAD");
-        ++i;
-    }
-    for (int i = 0; i < packetSize; ++i){
-      Serial.print(data[i]);
-    }
-    logSD(data);
-    transmitXbee(data);*/
 }
 
 void ackSD(){
@@ -143,27 +116,25 @@ void sendParam(){
     }
 }
 
-/*Implement a function to move forward with the next cmdSqnc*/
-
 void sendAck(){
     Wire.write('1');
 }
 
 void logSD(unsigned char* str){
-    /*if (!logger){ */logger = SD.open(flightLog, FILE_WRITE);// }
-    Serial.println(F("--------LOGGING SD!--------"));
+    logger = SD.open(flightLog, FILE_WRITE);
     char i = 0;
     while (i < packetSize){
         logger.write(str[i]);
         ++i;
     }
+    logger.write('\n');
     logger.close();
 }
 
 void transmitXbee(unsigned char* str){
-    int i = 0;
+    char i = 0;
     while (i < packetSize){
-        Serial.print(str[i], HEX);
+        Serial.print(str[i]);
         ++i;
     }
 }
