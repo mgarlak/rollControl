@@ -21,8 +21,6 @@ rocket::rocket(){
     pitchUp2Date = false;
     rollMatrixUp2Date = false;
     speedUp2Date = false;
-    Adafruit_BMP280 bmp;
-    Adafruit_BNO055 orient = Adafruit_BNO055(55);
 
     /*
     Get the gravity vector;
@@ -43,9 +41,10 @@ rocket::rocket(){
 
 float rocket::getSpeed(){
 	if(!speedUp2Date){
-        float inverseR[9];
-        Matrix.Copy((float *)R,3,3,(float *)inverseR);
-        Matrix.Invert((float *)inverseR);
+
+
+
+        
         /*
         rotate the acceleration vector by the inverse of the rotation matrix
         add the acceleration vector to the velocity vector.
@@ -72,10 +71,19 @@ int rocket::updateSensorData(Adafruit_BNO055 &bno, Adafruit_BMP280 &baro){
         oldZ=z;
         z = baro.readAltitude(1013.25 /*HARDCODED, WE'LL CHANGE LATER.  ADD TO CONFIG*/);
 
+        imu::vector<3> acell=bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+        float aTemp[3];
+        aTemp[0]=acell.x();
+        aTemp[1]=acell.y();
+        aTemp[2]=acell.z();
+
+        
+
         pitchUp2Date = false;
         rollUp2Date = false;
         rollMatrixUp2Date = false;
         speedUp2Date = false;
+
         return 1;
     }
     return 0;

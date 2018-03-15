@@ -64,8 +64,8 @@ private:
     // All values should be in ground frame.
 
     float z;
-    float oldZ;
-    float zV;
+    float v[3];
+    float a[3];
 
     bool rollUp2Date;
     bool pitchUp2Date;
