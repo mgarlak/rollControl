@@ -41,10 +41,9 @@ rocket::rocket(){
 
 float rocket::getSpeed(){
 	if(!speedUp2Date){
-
-
-
-        
+        float inverseR[9];
+        Matrix.Copy((float *)R,3,3,(float *)inverseR);
+        Matrix.Invert((float *)inverseR,3);
         /*
         rotate the acceleration vector by the inverse of the rotation matrix
         add the acceleration vector to the velocity vector.
@@ -58,7 +57,7 @@ float rocket::getSpeedSq(){
 }
 
 int rocket::updateSensorData(Adafruit_BNO055 &bno, Adafruit_BMP280 &baro){
-    long current=millis()
+    long current=millis();
     if(current-lastUpdate>10){
         deltaT=current-lastUpdate;
         lastUpdate=current;
@@ -91,7 +90,7 @@ int rocket::updateSensorData(Adafruit_BNO055 &bno, Adafruit_BMP280 &baro){
 
 float rocket::getPitch(){
     if (!pitchUp2Date){
-        rocketUp[3]={0};
+        float rocketUp[3]={0};
         Matrix.Multiply((float *)R,(float *)up,3,3,1,(float*)rocketUp);
 
         pitch=asin(dotProd((float*)up,(float*)rocketUp));
@@ -122,11 +121,11 @@ float rocket::getRoll(){
         float Qz=sin(angle2Vert/2)*axisOfRot[2];
 
         float R2[9]={0};
-        float R3[9]={0}
+        float R3[9]={0};
 
-        R2[0] = 1 - 2 * (SQ(Qy) + SQ(Qz)); R2[1] = 2 * (Qx*Qy - Qz*Qw); R2[2] = 2 * s*(Qx*Qz+Qy*Qw);
-	    R2[3] = 2 * (Qx*Qy+Qz*Qw); R2[4] = 1 - 2 * (SQ(Qx) + SQ(q_z)); R2[5] = 2 * (Qy*Qz-Qx*Qw);
-	    R2[6] = 2 * (Qx*Qz + Qy * Qw); R2[7] = 2 * (Qy*Qz + Qx * Qw); R[8] = 1 - 2 * (SQ(Qx) + SQ(Qy));
+        R2[0] = 1 - 2 * (SQ(Qy) + SQ(Qz)); R2[1] = 2 * (Qx*Qy - Qz*Qw); R2[2] = 2 * (Qx*Qz+Qy*Qw);
+	      R2[3] = 2 * (Qx*Qy+Qz*Qw); R2[4] = 1 - 2 * (SQ(Qx) + SQ(q_z)); R2[5] = 2 * (Qy*Qz-Qx*Qw);
+	      R2[6] = 2 * (Qx*Qz + Qy * Qw); R2[7] = 2 * (Qy*Qz + Qx * Qw); R[8] = 1 - 2 * (SQ(Qx) + SQ(Qy));
 
         Matrix.Multiply((float*)R,(float*)R2,3,3,3,(float*)R3);
 

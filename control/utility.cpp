@@ -1,9 +1,8 @@
 #ifndef UTILLITY_CPP
 #define UTILLITY_CPP
 
-#include"math.h"
-
-#include"utility.hpp"
+#include "utility.hpp"
+#include "math.h"
 
 float toFloat(unsigned char * c){
 
@@ -159,7 +158,7 @@ void cross(float* a,float* b,float* c){
 }
 
 float vecMag(float *v,char len){
-    return sqrt(dotProd(v,v))
+    return sqrt(dotProd(v,v));
 }
 
 void normalize(float* a,float*b){

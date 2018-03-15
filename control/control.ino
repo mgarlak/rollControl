@@ -80,7 +80,7 @@ void loop() {
             break;
         case 3:
             //Coast phase, where we control roll
-            ailerons.write(hprcRock.finAngle(deltaTorque(hprcRock,goalTorque(hprcRock))))
+            ailerons.write(hprcRock.finAngle(deltaTorque(hprcRock,goalTorque(hprcRock))));
             break;
         case 4:
             //Decent phase, initial
@@ -107,7 +107,7 @@ void resetDev(int pin){
 }
 
 float goalTorque(rocket & BFR){
-    float targetRoll=BFR.plan().getTargetAngle(millis())*(PI/180.0);
+    float targetRoll=BFR.getPlan().getTargetAngle(millis())*(PI/180.0);
     return -1*BFR.getDampingConstant()*BFR.getRollRate()-BFR.getSpringConstant()*(BFR.getRoll()-targetRoll);
 }
 
