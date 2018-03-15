@@ -8,7 +8,11 @@
 #define SQ(x) x*x
 
 
-rocket::rocket(){
+rocket::rocket(Adafruit_BNO055 &BNO, Adafruit_BMP280 &BMP){
+    //sensors
+    bno=BNO;
+    baro=BMP;
+
     // Orientation Data
     pitch = 0;
     roll = 0;
@@ -22,7 +26,23 @@ rocket::rocket(){
     rollMatrixUp2Date = false;
     speedUp2Date = false;
 
+    //Get the gravity vector and the magnetic field vector
+    imu::Vector<3> g=bno.getVector(VECTOR_GRAVITY);
+    imu::Vector<3> m=bno.getVector(VECTOR_MAGNETOMETER);
+
+    //Compute the up vector.  -g/|g|
+    g.normalize();
+    g=g*(-1);
+
+    //Compute the north vector.  the magnetic field - the projection of the magnetic field on the up vector.
+    m.normalize();
+    imu::Vector<3>n=m-(g*m.dot(g));
+
+    
+
+
     /*
+    
     Get the gravity vector;
     normalize it;
     multiply it by -1
@@ -56,7 +76,7 @@ float rocket::getSpeedSq(){
 	return SQ(getSpeed());
 }
 
-int rocket::updateSensorData(Adafruit_BNO055 &bno, Adafruit_BMP280 &baro){
+int rocket::updateSensorData(){
     long current=millis();
     if(current-lastUpdate>10){
         deltaT=current-lastUpdate;

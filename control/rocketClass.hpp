@@ -15,14 +15,12 @@
 #define fpacc 5
 #define numBytes 64
 
-#define PI 2*asin(1)
-
 class rocket {
 public:
-    rocket();
+    rocket(Adafruit_BNO055&, Adafruit_BMP280&);
     ~rocket(){};
     int fillModel(int, int);
-    int updateSensorData(Adafruit_BNO055&, Adafruit_BMP280&);
+    int updateSensorData;
     int logData(char*, int);
     int updateRotMatrix();
 
@@ -46,6 +44,9 @@ private:
     float Q[4] {0,0,0,0};
     float vQ[4] {0,0,0,0};
     float aQ[4] {0,0,0,0};
+
+    Adafruit_BNO055 &bno;
+    Adafruit_BMP280 &baro;
 
     float pitch;
     float roll;
