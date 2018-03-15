@@ -34,25 +34,17 @@ rocket::rocket(Adafruit_BNO055 &BNO, Adafruit_BMP280 &BMP){
     g.normalize();
     g=g*(-1);
 
+    up[0]=g.x();
+    up[1]=g.y();
+    up[2]=g.z();
+
     //Compute the north vector.  the magnetic field - the projection of the magnetic field on the up vector.
     m.normalize();
     imu::Vector<3>n=m-(g*m.dot(g));
 
-    
-
-
-    /*
-    
-    Get the gravity vector;
-    normalize it;
-    multiply it by -1
-    set up to that.
-    
-    get the magnetic field vector.
-    take the projection of the magnetic field vector on the up vector
-    subtract that projection from the magnetic vector
-    that's your north vector (or maybe the north vector multiplied by -1)
-    */
+    north[0]=n.x();
+    north[1]=n.y();
+    north[2]=n.z();
 
 
     omega = 0;
@@ -60,20 +52,25 @@ rocket::rocket(Adafruit_BNO055 &BNO, Adafruit_BMP280 &BMP){
 }
 
 float rocket::getSpeed(){
+    return sqrt(getSpeedSq);
+}
+float rocket::getSpeedSq(){
 	if(!speedUp2Date){
         float inverseR[9];
         Matrix.Copy((float *)R,3,3,(float *)inverseR);
         Matrix.Invert((float *)inverseR,3);
-        /*
-        rotate the acceleration vector by the inverse of the rotation matrix
-        add the acceleration vector to the velocity vector.
-
-        */
+        Matrix.Multiply((float *)inverseR,(float *)aNRocketFrame,3,3,1,(float * )a);
+        
+        v[0]+=(1000000.0/((float)deltaT))*a[0];
+        v[1]+=(1000000.0/((float)deltaT))*a[1];
+        v[2]+=(1000000.0/((float)deltaT))*a[2];   
     }
-    return /*the square root of the dot product of rocketUp and the velocity vector*/;
-}
-float rocket::getSpeedSq(){
-	return SQ(getSpeed());
+
+    updateRotMatrix()
+    float rocketUp[3]={0};
+    Matrix.Multiply((float *)R,(float *)up,3,3,1,(float*)rocketUp)
+
+    return dotProd((float *)v,(float *) rocketUp);
 }
 
 int rocket::updateSensorData(){
@@ -87,16 +84,15 @@ int rocket::updateSensorData(){
         q_y = quat.y();
         q_z = quat.z();
         q_w = quat.w();
-        oldZ=z;
-        z = baro.readAltitude(1013.25 /*HARDCODED, WE'LL CHANGE LATER.  ADD TO CONFIG*/);
+        
+        T=baro.readTemperature();
+        P=baro.readPressure()
+
 
         imu::vector<3> acell=bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
-        float aTemp[3];
-        aTemp[0]=acell.x();
-        aTemp[1]=acell.y();
-        aTemp[2]=acell.z();
-
-        
+        aNRocketFrame[0]=acell.x();
+        aNRocketFrame[1]=acell.y();
+        aNRocketFrame[2]=acell.z();
 
         pitchUp2Date = false;
         rollUp2Date = false;
@@ -110,6 +106,7 @@ int rocket::updateSensorData(){
 
 float rocket::getPitch(){
     if (!pitchUp2Date){
+        updateRotMatrix();
         float rocketUp[3]={0};
         Matrix.Multiply((float *)R,(float *)up,3,3,1,(float*)rocketUp);
 
@@ -125,43 +122,57 @@ float rocket::getRoll(){
         float oldRoll=roll;
 
         float rocketNorth[3]={0};
+        float east[3]={0};
         float rocketUp[3]={0};
-        float axisOfRot[3]={0};
+
+        float R3[9]={0};
+
 
         Matrix.Multiply((float *)R,(float *)up,3,3,1,(float*)rocketUp);
 
-        cross((float*)up,(float*)rocketUp,(float*)axisOfRot);//May need to change the order of up and rocket up?
-        float angle2Vert=asin(vecMag((float*)axisOfRot,3));
-        normalize((float*)axisOfRot,(float*)axisOfRot);
+        //calculate the east unit vector
+        cross((float *)north,(float *)up,(float *)east);
+        normalize((float *)east,(float *)east);
+        if(dotProd(float*)up,(float *)rocketUp<0.9999){ // Breaks for the rocket pointed stragith down.  Hopefully won't be an issue.
 
-        //Calculate quaternion that will turn the rockets pointing vector straight up
-        float Qw=cos(angle2Vert/2);
-        float Qx=sin(angle2Vert/2)*axisOfRot[0];
-        float Qy=sin(angle2Vert/2)*axisOfRot[1];
-        float Qz=sin(angle2Vert/2)*axisOfRot[2];
+            cross((float*)up,(float*)rocketUp,(float*)axisOfRot);//May need to change the order of up and rocket up?
+            float angle2Vert=asin(vecMag((float*)axisOfRot,3));
+            normalize((float*)axisOfRot,(float*)axisOfRot);
 
-        float R2[9]={0};
-        float R3[9]={0};
+            //Calculate quaternion that will turn the rockets pointing vector straight up
+            float Qw=cos(angle2Vert/2);
+            float Qx=sin(angle2Vert/2)*axisOfRot[0];
+            float Qy=sin(angle2Vert/2)*axisOfRot[1];
+            float Qz=sin(angle2Vert/2)*axisOfRot[2];
 
-        R2[0] = 1 - 2 * (SQ(Qy) + SQ(Qz)); R2[1] = 2 * (Qx*Qy - Qz*Qw); R2[2] = 2 * (Qx*Qz+Qy*Qw);
-	      R2[3] = 2 * (Qx*Qy+Qz*Qw); R2[4] = 1 - 2 * (SQ(Qx) + SQ(q_z)); R2[5] = 2 * (Qy*Qz-Qx*Qw);
-	      R2[6] = 2 * (Qx*Qz + Qy * Qw); R2[7] = 2 * (Qy*Qz + Qx * Qw); R[8] = 1 - 2 * (SQ(Qx) + SQ(Qy));
-
-        Matrix.Multiply((float*)R,(float*)R2,3,3,3,(float*)R3);
-
-        Matrix.Multiply((float *)R3,(float *)north,3,3,1,(float*)rocketNorth);//TODO: swap R with the matrix mentioned above
-        Matrix.Print((float*)rocketNorth,3,1,"n"); //Remove after we've check that the vertical component is negligible.
-
-        if (rocketNorth[1]==0){
-            roll = rocketNorth[0]>0 ? PI/2.0 : (3.0/2.0)*PI;
-        } else roll= (rocketNorth[0]>0 ? 0 : PI) + atan(rocketNorth[0]/rocketNorth[1]);//TODO: make sure this accurately calculates roll for all angles
+            //Calculate the rotation matric.
+            float R2[9]={0};
         
+            R2[0] = 1 - 2 * (SQ(Qy) + SQ(Qz)); R2[1] = 2 * (Qx*Qy - Qz*Qw); R2[2] = 2 * (Qx*Qz+Qy*Qw);
+	        R2[3] = 2 * (Qx*Qy+Qz*Qw); R2[4] = 1 - 2 * (SQ(Qx) + SQ(q_z)); R2[5] = 2 * (Qy*Qz-Qx*Qw);
+	        R2[6] = 2 * (Qx*Qz + Qy * Qw); R2[7] = 2 * (Qy*Qz + Qx * Qw); R[8] = 1 - 2 * (SQ(Qx) + SQ(Qy));
+            
+            Matrix.Multiply((float*)R,(float*)R2,3,3,3,(float*)R3);
+
+        } else {
+            Matrix.Copy((float *)R,(float *)R3); // If pitch is near verticle, we don't need to do the "virtual pitch up"
+        }
+
+        Matrix.Multiply((float *)R3,(float *)north,3,3,1,(float*)rocketNorth);
+        
+        //Calculate the roll:
+        if (dotProd((float *)rocketNorth,(float *)east)>0){
+            roll=acos(dotProd(float *)rocketNorth,(float *)north))
+        } else {
+            roll=2.0*PI-acos(dotProd(float *)rocketNorth,(float *)north))
+        }
+
         //Calculate roll rate:
-        if(oldRoll > 3.0/2.0*PI && roll < 1.0/4.0*PI){
-            rollRate=1000.0*(roll-oldRoll+2.0*PI)/float(deltaT);
-        } else if(roll > 3.0/2.0*PI && oldRoll < 1.0/2.0*PI){
-            rollRate=1000.0*(roll-oldRoll)/float(deltaT);
-        } else rollRate=1000.0*(roll-oldRoll-2.0*PI)/float(deltaT);
+        if(oldRoll > 7.0/4.0*PI && roll < 1.0/4.0*PI){ //Roll has likely passed from near all the way around the way around the circle through zero.
+            rollRate=1000000.0*(roll-oldRoll+2.0*PI)/float(deltaT);
+        } else if(roll > 7.0/4.0*PI && oldRoll < 1.0/4.0*PI){ //Roll has likely passed from barely around the circle through zero
+            rollRate=1000000.0*(roll-oldRoll)/float(deltaT);
+        } else rollRate=1000000.0*(roll-oldRoll-2.0*PI)/float(deltaT); //Roll has not passed through zero.
     }
     rollUp2Date = true;
     return roll;
