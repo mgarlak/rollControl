@@ -11,7 +11,7 @@ union charFloatConverter{
 
 //Float-byte converters for coms-control communication
 float toFloat(unsigned char *);
-void toChar(float, unsigned char *); 
+void toChar(float, unsigned char *);
 
 //FlightPlan utility
 bool isDigit(char);
@@ -24,7 +24,12 @@ int getCaSize(char*);
 char* caAppend(char*, char);
 int pftoi(float&);
 
-void toHex(unsigned char*, char*, char);
+void toHex(unsigned char*, unsigned char*, char);
+//vector math calculations
+void cross(float*,float*,float*);
+float vecMag(float *,char);
+void normalize(float*,float*);
+float dotProd(float*,float*);
 
 //RocketClass utility
 

@@ -3,12 +3,21 @@
 #define commsRst 6
 #define controlRst 7
 #define servoPin 8
+
+//Global variables;
+
 int flightMode;
 rocket hprcRock;
 Adafruit_BMP280 bmp;
 Adafruit_BNO055 orient = Adafruit_BNO055(55);
 Servo ailerons;
 bool nfpValid;
+bool wireFlag = false;
+
+//Control algorithm functions
+
+float goalTorque(rocket &);
+float deltaTorque(rocket&,float);
 
 void setup() {
     serialDump();
@@ -65,15 +74,19 @@ void loop() {
             //boost phase
             break;
         case 2:
-            //Coast phase, where we control roll
+            //No control cost.  May be skipped, depending on what the competion rules are
             break;
         case 3:
-            //Decent phase, initial
+            //Coast phase, where we control roll
+            ailerons.write(hprcRock.finAngle(deltaTorque(hprcRock,goalTorque(hprcRock))));
             break;
         case 4:
-            //Decent phase, after main chute deply
+            //Decent phase, initial
             break;
         case 5:
+            //Decent phase, after main chute deply
+            break;
+        case 6:
             //on ground
             break;
     }
@@ -124,3 +137,12 @@ void newFlightPlan(){
 
 void sendAck(){ Wire.write('0'); }
 void sendErr(){ Wire.write('1'); }
+
+float goalTorque(rocket & BFR){
+    float targetRoll=BFR.getPlan().getTargetAngle(millis())*(PI/180.0);
+    return -1*BFR.getDampingConstant()*BFR.getRollRate()-BFR.getSpringConstant()*(BFR.getRoll()-targetRoll);
+}
+
+float deltaTorque(rocket& BFR,float goal){
+    return BFR.getInherientTorque()-goal;
+}

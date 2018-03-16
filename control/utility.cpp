@@ -1,6 +1,7 @@
 #ifndef UTILLITY_CPP
 #define UTILLITY_CPP
 #include"utility.hpp"
+#include "math.h"
 
 
 char hex[16] = {'0','1','2','3','4','5','6','7','8','9',
@@ -90,7 +91,7 @@ char* caAppend(char* in, char e){
         in[0] = e;
         in[1] = '\0';
         return in;
-    } 
+    }
     else{
         int size = getCaSize(in);
         char* temp = new char[size+2];
@@ -136,17 +137,17 @@ float catof(char* num){
                 divisor *= 10;
                 lhs += ((float)(*num - '0'))/divisor;
             }
-            else{ 
+            else{
                 rhs = rhs*10 + (*num - '0');
             }
         }
         else if (*num == '.'){
             if (inFraction)
                 return sign * (rhs + lhs);
-            else 
+            else
                 inFraction = true;
         }
-        else 
+        else
             return sign * (rhs + lhs);
         ++num;
     }
@@ -160,9 +161,7 @@ void cross(float* a,float* b,float* c){
 }
 
 float vecMag(float *v,char len){
-    float result=0;
-    for(char i=0; i<len; ++i) result+=v[i]*v[i];
-    return sqrt(result);
+    return sqrt(dotProd(v,v));
 }
 
 void normalize(float* a,float*b){
@@ -172,13 +171,17 @@ void normalize(float* a,float*b){
     b[2]=a[2]/vecAMag;
 }
 
-void toHex(unsigned char* in, char* out, char len){
+void toHex(unsigned char* in, unsigned char* out, char len){
     char i = 0;
     for (; i < len; ++i){
         out[2*i] = hex[(in[i]/16)];
         out[(2*i)+1] = hex[(in[i]%16)];
     }
     out[2*i] = '\0';
+}
+
+float dotProd(float* a,float* b){
+    return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
 }
 
 #endif

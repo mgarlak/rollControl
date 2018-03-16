@@ -17,6 +17,12 @@ unsigned char* data = new unsigned char[packetSize];
 char* fp2 = nullptr;
 bool keepListening = false;
 
+void serialEvent() {
+  if (Serial.available()) {
+    Serial.write(Serial.read());
+  }
+}
+
 void setup(){
     serialDump();
     SD.begin(sdPin);
@@ -74,8 +80,8 @@ void receiveHandler(int bytesReceived){
         //Serial.print(data[i]);
         ++i;
     }
-    char* out = new char[(packetSize*2)+1];
-    toHex(data, out, packetSize);
+    unsigned char* out = new unsigned char[(packetSize*2)+1];
+    toHex(data, out, (packetSize*2)+1);
     logSD(out);
     transmitXbee(out);
     delete[] out;
