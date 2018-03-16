@@ -1,8 +1,11 @@
 #ifndef UTILLITY_CPP
 #define UTILLITY_CPP
-
-#include "utility.hpp"
+#include"utility.hpp"
 #include "math.h"
+
+
+char hex[16] = {'0','1','2','3','4','5','6','7','8','9',
+                'A','B','C','D','E','F'};
 
 float toFloat(unsigned char * c){
 
@@ -18,9 +21,9 @@ float toFloat(unsigned char * c){
 
 void toChar(float in, unsigned char * c) {
     charFloatConverter converter;
-	converter.f = in;
+    converter.f = in;
 
-	c[0] = converter.b[0];
+    c[0] = converter.b[0];
     c[1] = converter.b[1];
     c[2] = converter.b[2];
     c[3] = converter.b[3];
@@ -88,7 +91,7 @@ char* caAppend(char* in, char e){
         in[0] = e;
         in[1] = '\0';
         return in;
-    } 
+    }
     else{
         int size = getCaSize(in);
         char* temp = new char[size+2];
@@ -134,17 +137,17 @@ float catof(char* num){
                 divisor *= 10;
                 lhs += ((float)(*num - '0'))/divisor;
             }
-            else{ 
+            else{
                 rhs = rhs*10 + (*num - '0');
             }
         }
         else if (*num == '.'){
             if (inFraction)
                 return sign * (rhs + lhs);
-            else 
+            else
                 inFraction = true;
         }
-        else 
+        else
             return sign * (rhs + lhs);
         ++num;
     }
@@ -166,6 +169,15 @@ void normalize(float* a,float*b){
     b[0]=a[0]/vecAMag;
     b[1]=a[1]/vecAMag;
     b[2]=a[2]/vecAMag;
+}
+
+void toHex(unsigned char* in, unsigned char* out, char len){
+    char i = 0;
+    for (; i < len; ++i){
+        out[2*i] = hex[(in[i]/16)];
+        out[(2*i)+1] = hex[(in[i]%16)];
+    }
+    out[2*i] = '\0';
 }
 
 float dotProd(float* a,float* b){

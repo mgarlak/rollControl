@@ -6,7 +6,7 @@
 #define q_z Q[2]
 #define q_w Q[3]
 #define SQ(x) x*x
-
+#define packetSize 22
 
 rocket::rocket(){
     // Orientation Data
@@ -29,7 +29,7 @@ rocket::rocket(){
     normalize it;
     multiply it by -1
     set up to that.
-    
+
     get the magnetic field vector.
     take the projection of the magnetic field vector on the up vector
     subtract that projection from the magnetic vector
@@ -52,10 +52,10 @@ float rocket::getSpeed(){
 
         */
     }
-    return /*the square root of the dot product of rocketUp and the velocity vector*/;
+    return 0/*the square root of the dot product of rocketUp and the velocity vector*/;
 }
 float rocket::getSpeedSq(){
-	return SQ(getSpeed());
+    return SQ(getSpeed());
 }
 
 int rocket::updateSensorData(Adafruit_BNO055 &bno, Adafruit_BMP280 &baro){
@@ -70,7 +70,7 @@ int rocket::updateSensorData(Adafruit_BNO055 &bno, Adafruit_BMP280 &baro){
         q_z = quat.z();
         q_w = quat.w();
         oldZ=z;
-        z = baro.readAltitude(1013.25 /*HARDCODED, WE'LL CHANGE LATER.  ADD TO CONFIG*/);
+        z = baro.readAltitude(calibrationPressure);
 
         pitchUp2Date = false;
         rollUp2Date = false;
@@ -128,7 +128,7 @@ float rocket::getRoll(){
         if (rocketNorth[1]==0){
             roll = rocketNorth[0]>0 ? PI/2.0 : (3.0/2.0)*PI;
         } else roll= (rocketNorth[0]>0 ? 0 : PI) + atan(rocketNorth[0]/rocketNorth[1]);//TODO: make sure this accurately calculates roll for all angles
-        
+
         //Calculate roll rate:
         if(oldRoll > 3.0/2.0*PI && roll < 1.0/4.0*PI){
             rollRate=1000.0*(roll-oldRoll+2.0*PI)/float(deltaT);
@@ -144,12 +144,12 @@ int rocket::updateRotMatrix(){
     if(!rollMatrixUp2Date){
         float q =  (SQ(q_x) + SQ(q_y) + SQ(q_z) + SQ(q_w));//Magnatude of the quaternion squared;
         float s = (q == 0) ? 1 : (1.0 / q);
-    
+
         R[0] = 1 - 2 * s*(SQ(q_y) + SQ(q_z)); R[1] = 2 * s*(q_x*q_y - q_z*q_w); R[2] = 2 * s*(q_x*q_z+q_y*q_w);
 	    R[3] = 2 * s*(q_x*q_y+q_z*q_w); R[4] = 1 - 2 * s*(SQ(q_x) + SQ(q_z)); R[5] = 2 * s*(q_y*q_z-q_x*q_w);
 	    R[6] = 2 * s*(q_x*q_z + q_y * q_w); R[7] = 2 * s*(q_y*q_z + q_x * q_w); R[8] = 1 - 2 * s*(SQ(q_x) + SQ(q_y));
-      
-    }    
+
+    }
 
     rollMatrixUp2Date=true;
     return 0;
@@ -157,7 +157,7 @@ int rocket::updateRotMatrix(){
 
 float rocket::getRollRate(){
     getRoll();
-	return rollRate;
+    return rollRate;
 }
 
 int rocket::fillModel(int fpsize, int devName){
@@ -173,17 +173,42 @@ int rocket::fillModel(int fpsize, int devName){
         switch (property){
             case 0: omega = catof(str); break;
             case 1: moi = catof(str); break;
-            case 2: plan.parseFlightPlan(str); break;
+            case 2: calibrationPressure = catof(str); break;
+            case 3: plan.parseFlightPlan(str); break;
         }
         {
-          delete[] str;
-          str = nullptr;
+            delete[] str;
+            str = nullptr;
         }
         ++property;
     }
     return 0;
 }
 
-int rocket::logData(char* fname, int floatSize){
-    
+int rocket::sendDataComms(int device){
+    unsigned char* msg = new unsigned char[packetSize];
+    unsigned char i = 0;
+    for (; i < 4; ++i){
+        toChar(Q[i], msg+(i*4));
+    }
+    toChar(z, msg+(i*4));
+    msg[++i] = '1';
+
+    //Serial.println("SENDING");
+    Wire.beginTransmission(device);
+    unsigned char* out = new unsigned char[(packetSize*2) + 1];
+    toHex(msg, out, packetSize);
+    char j = 0;
+    while (j < packetSize){
+        //Serial.print(out[j*2]);
+        //Serial.print(out[(j*2)+1]);
+        Wire.write(msg[j]);
+        ++j;
+    }
+
+    Wire.endTransmission();
+    delete[] out;
+    out = nullptr;
+    delete[] msg;
+    msg = nullptr;
 }
