@@ -29,6 +29,16 @@ void toChar(float in, unsigned char * c) {
     c[3] = converter.b[3];
 }
 
+void toChar(unsigned long in, unsigned char * c) {
+    charFloatConverter converter;
+    converter.l = in;
+
+    c[0] = converter.b[0];
+    c[1] = converter.b[1];
+    c[2] = converter.b[2];
+    c[3] = converter.b[3];
+}
+
 bool isDigit(char c)
 {
     return '0' <= c && c <= '9';
