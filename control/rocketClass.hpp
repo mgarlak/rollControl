@@ -10,7 +10,7 @@
 #include "flightplan.hpp"
 #include "utility.hpp"
 
-#define numOfCParams 3
+#define numOfCParams 4
 #define commsDevice 19
 #define fpacc 5
 #define numBytes 64
@@ -20,8 +20,8 @@ public:
     rocket(Adafruit_BNO055&, Adafruit_BMP280&);
     ~rocket(){};
     int fillModel(int, int);
-    int updateSensorData;
-    int logData(char*, int);
+    int updateSensorData();
+    int sendDataComms(int);
     int updateRotMatrix();
 
     float getSpeed();
@@ -30,6 +30,7 @@ public:
     float getRollRate();
     float getPitch();
     float getz() {return z;};
+    flightplan getPlan(){return plan;};
     float* getQ() {return (float*)Q;};
 
     float getDampingConstant() { return 1.0; }
@@ -38,7 +39,7 @@ public:
     float getInherientTorque() { return 0.0; } //TODO: impliment
     int finAngle(float f) { return static_cast<int>(f); }
 
-    const flightplan& getPlan(){ return plan;}
+    //const flightplan& getPlan(){ return plan;}
 private:
     // Orientation Data
     float Q[4] {0,0,0,0};
@@ -76,6 +77,7 @@ private:
     bool speedUp2Date;
 
     float omega;
+    float calibrationPressure;
     float moi;
     flightplan plan;
 };
