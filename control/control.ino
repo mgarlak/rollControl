@@ -10,7 +10,7 @@ int flightMode;
 
 Adafruit_BMP280 bmp;
 Adafruit_BNO055 orient = Adafruit_BNO055(55);
-rocket hprcRock(orient,bmp);
+rocket hprcRock(&orient,&bmp);
 Servo ailerons;
 bool nfpValid;
 bool wireFlag = false;
@@ -63,7 +63,7 @@ void setup() {
 void loop() {
     Serial.println(F("IN LOOP"));
     //any code that needs to run every loop regardless of flightMode.
-    if (hprcRock.updateSensorData(orient, bmp) == 0){
+    if (hprcRock.updateSensorData() == 0){
 
     }
     hprcRock.sendDataComms(commsDevice);

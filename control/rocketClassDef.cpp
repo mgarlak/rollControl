@@ -8,7 +8,7 @@
 #define SQ(x) x*x
 #define packetSize 42
 
-rocket::rocket(Adafruit_BNO055 &BNO, Adafruit_BMP280 &BMP){
+rocket::rocket(Adafruit_BNO055 *BNO, Adafruit_BMP280 *BMP){
     //sensors
     bno=BNO;
     baro=BMP;
@@ -19,16 +19,14 @@ rocket::rocket(Adafruit_BNO055 &BNO, Adafruit_BMP280 &BMP){
     rollRate = 0;
     // Location Data and Trajectory
     // All values should be in ground frame.
-    z = 0;   // Altitude
-    zV = 0;  // Change in Altitude
     rollUp2Date = false;
     pitchUp2Date = false;
     rollMatrixUp2Date = false;
     speedUp2Date = false;
 
     //Get the gravity vector and the magnetic field vector
-    imu::Vector<3> g=bno.getVector(VECTOR_GRAVITY);
-    imu::Vector<3> m=bno.getVector(VECTOR_MAGNETOMETER);
+    imu::Vector<3> g=bno->getVector(Adafruit_BNO055::VECTOR_GRAVITY);
+    imu::Vector<3> m=bno->getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
 
     //Compute the up vector.  -g/|g|
     g.normalize();
@@ -51,7 +49,7 @@ rocket::rocket(Adafruit_BNO055 &BNO, Adafruit_BMP280 &BMP){
 }
 
 float rocket::getSpeed(){
-    return sqrt(getSpeedSq);
+    return sqrt(getSpeedSq());
 }
 float rocket::getSpeedSq(){
 	if(!speedUp2Date){
@@ -59,14 +57,14 @@ float rocket::getSpeedSq(){
         Matrix.Copy((float *)R,3,3,(float *)inverseR);
         Matrix.Invert((float *)inverseR,3);
         Matrix.Multiply((float *)inverseR,(float *)aNRocketFrame,3,3,1,(float * )a);
-        
+
         v[0]+=(1000000.0/((float)deltaT))*a[0];
         v[1]+=(1000000.0/((float)deltaT))*a[1];
-        v[2]+=(1000000.0/((float)deltaT))*a[2];   
+        v[2]+=(1000000.0/((float)deltaT))*a[2];
     }
-    updateRotMatrix()
+    updateRotMatrix();
     float rocketUp[3]={0};
-    Matrix.Multiply((float *)R,(float *)up,3,3,1,(float*)rocketUp)
+    Matrix.Multiply((float *)R,(float *)up,3,3,1,(float*)rocketUp);
 
     return dotProd((float *)v,(float *) rocketUp);
 }
@@ -77,17 +75,17 @@ int rocket::updateSensorData(){
         deltaT=current-lastUpdate;
         lastUpdate=current;
 
-        imu::Quaternion quat = bno.getQuat();
+        imu::Quaternion quat = bno->getQuat();
         q_x = quat.x();
         q_y = quat.y();
         q_z = quat.z();
         q_w = quat.w();
-      
-        T=baro.readTemperature();
-        P=baro.readPressure()
+
+        T=baro->readTemperature();
+        P=baro->readPressure();
 
 
-        imu::vector<3> acell=bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+        imu::Vector<3> acell = bno->getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
         aNRocketFrame[0]=acell.x();
         aNRocketFrame[1]=acell.y();
         aNRocketFrame[2]=acell.z();
@@ -131,8 +129,9 @@ float rocket::getRoll(){
         //calculate the east unit vector
         cross((float *)north,(float *)up,(float *)east);
         normalize((float *)east,(float *)east);
-        if(dotProd(float*)up,(float *)rocketUp<0.9999){ // Breaks for the rocket pointed stragith down.  Hopefully won't be an issue.
-
+        if(dotProd((float*)up,(float *)rocketUp)<0.9999){ // Breaks for the rocket pointed stragith down.  Hopefully won't be an issue.
+            float axisOfRot[3] = {0};
+            
             cross((float*)up,(float*)rocketUp,(float*)axisOfRot);//May need to change the order of up and rocket up?
             float angle2Vert=asin(vecMag((float*)axisOfRot,3));
             normalize((float*)axisOfRot,(float*)axisOfRot);
@@ -145,24 +144,24 @@ float rocket::getRoll(){
 
             //Calculate the rotation matric.
             float R2[9]={0};
-        
+
             R2[0] = 1 - 2 * (SQ(Qy) + SQ(Qz)); R2[1] = 2 * (Qx*Qy - Qz*Qw); R2[2] = 2 * (Qx*Qz+Qy*Qw);
 	        R2[3] = 2 * (Qx*Qy+Qz*Qw); R2[4] = 1 - 2 * (SQ(Qx) + SQ(q_z)); R2[5] = 2 * (Qy*Qz-Qx*Qw);
 	        R2[6] = 2 * (Qx*Qz + Qy * Qw); R2[7] = 2 * (Qy*Qz + Qx * Qw); R[8] = 1 - 2 * (SQ(Qx) + SQ(Qy));
-            
+
             Matrix.Multiply((float*)R,(float*)R2,3,3,3,(float*)R3);
 
         } else {
-            Matrix.Copy((float *)R,(float *)R3); // If pitch is near verticle, we don't need to do the "virtual pitch up"
+            Matrix.Copy((float *)R,3,3,(float *)R3); // If pitch is near verticle, we don't need to do the "virtual pitch up"
         }
 
         Matrix.Multiply((float *)R3,(float *)north,3,3,1,(float*)rocketNorth);
-        
+
         //Calculate the roll:
         if (dotProd((float *)rocketNorth,(float *)east)>0){
-            roll=acos(dotProd(float *)rocketNorth,(float *)north))
+            roll=acos(dotProd((float *)rocketNorth,(float *)north));
         } else {
-            roll=2.0*PI-acos(dotProd(float *)rocketNorth,(float *)north))
+            roll=2.0*PI-acos(dotProd((float *)rocketNorth,(float *)north));
         }
 
         //Calculate roll rate:
@@ -232,18 +231,18 @@ int rocket::sendDataComms(int device){
     unsigned long micro = micros();
     toChar(micro, msg+(i*4));
     ++i;
-    // Altitude !!!TO BE REPLACED WITH PRESSURE!!!(4) bytes
-    toChar(z, msg+(i*4));
+    // Pressure (4) bytes
+    toChar(P, msg+(i*4));
     ++i;
     // Vector a(12 bytes)
     unsigned char it = 0;
     while (it < 3){
-        toChar(A[it], msg+(i*4));
+        toChar(aNRocketFrame[it], msg+(i*4));
         ++it; ++i;
     }
 
     // temp (4 bytes)
-    toChar();
+    toChar(T, msg+(i*4));
     ++i;
     // flight event (1 byte)
     msg[++i] = '1';

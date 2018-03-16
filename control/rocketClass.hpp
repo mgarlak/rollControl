@@ -17,7 +17,7 @@
 
 class rocket {
 public:
-    rocket(Adafruit_BNO055&, Adafruit_BMP280&);
+    rocket(Adafruit_BNO055*, Adafruit_BMP280*);
     ~rocket(){};
     int fillModel(int, int);
     int updateSensorData();
@@ -29,7 +29,6 @@ public:
     float getRoll();
     float getRollRate();
     float getPitch();
-    float getz() {return z;};
     flightplan getPlan(){return plan;};
     float* getQ() {return (float*)Q;};
 
@@ -44,8 +43,8 @@ private:
     // Orientation Data
     float Q[4] {0,0,0,0};
 
-    Adafruit_BNO055 &bno;
-    Adafruit_BMP280 &baro;
+    Adafruit_BNO055 *bno;
+    Adafruit_BMP280 *baro;
 
     float pitch;
     float roll;
