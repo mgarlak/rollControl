@@ -6,7 +6,7 @@
 #define q_z Q[2]
 #define q_w Q[3]
 #define SQ(x) x*x
-#define packetSize 22
+#define packetSize 42
 
 rocket::rocket(){
     // Orientation Data
@@ -188,10 +188,28 @@ int rocket::fillModel(int fpsize, int devName){
 int rocket::sendDataComms(int device){
     unsigned char* msg = new unsigned char[packetSize];
     unsigned char i = 0;
+    // quaternion (16 bytes)
     for (; i < 4; ++i){
         toChar(Q[i], msg+(i*4));
     }
+    // micros (timestamp) (4 bytes)
+    unsigned long micro = micros();
+    toChar(micro, msg+(i*4));
+    ++i;
+    // Altitude !!!TO BE REPLACED WITH PRESSURE!!!(4) bytes
     toChar(z, msg+(i*4));
+    ++i;
+    // Vector a(12 bytes)
+    unsigned char it = 0;
+    while (it < 3){
+        toChar(A[it], msg+(i*4));
+        ++it; ++i;
+    }
+
+    // temp (4 bytes)
+    toChar();
+    ++i;
+    // flight event (1 byte)
     msg[++i] = '1';
 
     //Serial.println("SENDING");

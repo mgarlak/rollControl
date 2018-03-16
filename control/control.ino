@@ -90,7 +90,6 @@ void loop() {
             //on ground
             break;
     }
-    delay(100);
 }
 
 void receiveHandler(int bytesReceived){
