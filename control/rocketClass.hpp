@@ -17,10 +17,10 @@
 
 class rocket {
 public:
-    rocket();
+    rocket(Adafruit_BNO055&, Adafruit_BMP280&);
     ~rocket(){};
     int fillModel(int, int);
-    int updateSensorData(Adafruit_BNO055&, Adafruit_BMP280&);
+    int updateSensorData();
     int sendDataComms(int);
     int updateRotMatrix();
 
@@ -43,8 +43,9 @@ public:
 private:
     // Orientation Data
     float Q[4] {0,0,0,0};
-    float vQ[4] {0,0,0,0};
-    float aQ[4] {0,0,0,0};
+
+    Adafruit_BNO055 &bno;
+    Adafruit_BMP280 &baro;
 
     float pitch;
     float roll;
@@ -62,9 +63,13 @@ private:
     // Location Data and Trajectory
     // All values should be in ground frame.
 
-    float z;
-    float oldZ;
-    float zV;
+    float v[3]{0,0,0};
+    float a[3]{0,0,0};
+    float aNRocketFrame[3]{0,0,0};
+
+    //atomospheric data
+    float P;
+    float T;
 
     bool rollUp2Date;
     bool pitchUp2Date;
