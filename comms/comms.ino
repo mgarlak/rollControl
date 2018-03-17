@@ -81,9 +81,9 @@ void receiveHandler(int bytesReceived){
         ++i;
     }
     unsigned char* out = new unsigned char[(packetSize*2)+1];
-    toHex(data, out, (packetSize*2)+1);
-    logSD(out);
-    transmitXbee(out);
+    toHex(data, out, packetSize);
+    logSD(out,(packetSize*2)+1);
+    transmitXbee(out,(packetSize*2)+1);
     delete[] out;
     out = nullptr;
 }
@@ -126,10 +126,10 @@ void sendAck(){
     Wire.write('1');
 }
 
-void logSD(unsigned char* str){
+void logSD(unsigned char* str, int len){
     logger = SD.open(flightLog, FILE_WRITE);
     char i = 0;
-    while (i < packetSize){
+    while (i < len){
         logger.write(str[i]);
         ++i;
     }
@@ -137,9 +137,9 @@ void logSD(unsigned char* str){
     logger.close();
 }
 
-void transmitXbee(unsigned char* str){
+void transmitXbee(unsigned char* str, int len){
     char i = 0;
-    while (i < packetSize){
+    while (i < len){
         Serial.print(str[i]);
         ++i;
     }
