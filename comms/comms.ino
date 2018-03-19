@@ -16,12 +16,7 @@ int cmdSqnc = 0;
 unsigned char* data = new unsigned char[packetSize];
 char* fp2 = nullptr;
 bool keepListening = false;
-
-void serialEvent() {
-  if (Serial.available()) {
-    Serial.write(Serial.read());
-  }
-}
+int flightEvent;
 
 void setup(){
     serialDump();
@@ -61,7 +56,6 @@ void loop(){
         else if (inc == -1) continue;
         else fp2 = caAppend(fp2, inc);
     }
-    delay(100);
 }
 
 void requestHandler(){
@@ -74,10 +68,8 @@ void requestHandler(){
 
 void receiveHandler(int bytesReceived){
     char i = 0;
-    Serial.print("Received: ");
     while(Wire.available()){
         data[i] = Wire.read();
-        //Serial.print(data[i]);
         ++i;
     }
     unsigned char* out = new unsigned char[(packetSize*2)+1];

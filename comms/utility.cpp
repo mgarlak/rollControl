@@ -1,6 +1,7 @@
 #ifndef UTILLITY_CPP
 #define UTILLITY_CPP
 #include"utility.hpp"
+#include "math.h"
 
 
 char hex[16] = {'0','1','2','3','4','5','6','7','8','9',
